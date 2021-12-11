@@ -14,6 +14,12 @@ It will support:
 - CRUD user information
 - Users can rate dorm/apartment listings
 
+Functionalities for in-memory key-value storage will support:
+- CRUD dorm/apartment listings
+- Ranking list for listings based on highest rating ranking 
+- Filtering system for rendering available and unavailable listings separately to the browser when called for both owners and students
+
+
 ## Installation and Execution
 
 1. Clone the repository
