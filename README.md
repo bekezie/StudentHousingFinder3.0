@@ -29,24 +29,6 @@ Ranking Listings
 
 - By doing so we can call each listing object by its key in a sorted set which is ordered by the score attribute from each listing object.
 
-Example:
-Hash Set:
-        ListingID
-listing:1005 {
-Field 	 Value
-title     Vybe Living
-score:    1
-}
-        ListingID
-listing:1003 {
-Field 	 Value
-title     The Commons
-score:    2
-}
-
-Sorted Set:
-rankListing {score: 1, value: listing:1005, score: 2, value: listing: 1003}
-
 ![image](https://user-images.githubusercontent.com/73091370/145693361-a7ca4396-8d8d-4bd6-a91f-abcc6a7d23dd.png)
 
 
