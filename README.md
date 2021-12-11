@@ -56,6 +56,7 @@ Bernard Ekezie (https://github.com/bekezie) & Ely (Esther) Lam (https://github.c
 - CRUD operations on the students and schools
 - CRUD operations on the ratings
 - CRUD operations on the user and ensuring users have a unique username.
+- Created Document Base Logical modal 
 
 # Project 2 (Part 2: Design):
 
