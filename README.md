@@ -29,6 +29,8 @@ Ranking Listings
 
 - By doing so we can call each listing object by its key in a sorted set which is ordered by the score attribute from each listing object.
 
+![Logo](screenshots/RankListing.png)
+
 ![image](https://user-images.githubusercontent.com/73091370/145693361-a7ca4396-8d8d-4bd6-a91f-abcc6a7d23dd.png)
 
 
