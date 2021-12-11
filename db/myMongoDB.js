@@ -1,5 +1,5 @@
 const { MongoClient, ObjectId } = require("mongodb");
-
+const { createClient } = require("redis");
 /*
  ***************Student and Owner CRUD OPERATIONS*********************
  */
@@ -253,6 +253,41 @@ let StudentHousingDBController = function () {
     }
   };
 
+  // get all Listings , may implement pagination later
+  studentHousingDB.getRankedListings = async () => {
+    let client;
+    try {
+      client = new MongoClient(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      await client.connect();
+      const db = client.db(DB_NAME);
+      const listingsCollection = db.collection("listings");
+      // we will be using the user's email as their username
+      const queryResult = await listingsCollection
+        .aggregate([
+          {
+            $addFields: {
+              avgRating: { $avg: "$rating.rating" },
+            },
+          },
+          {
+            $sort: {
+              avgRating: -1,
+            },
+          },
+        ])
+        .toArray();
+      return queryResult;
+    } catch (err) {
+      console.log(err);
+    } finally {
+      // we have to close the database connection otherwise we will overload the mongodb service.
+      await client.close();
+    }
+  };
+
   studentHousingDB.getRatingByIDS = async (listingID, user) => {
     let client;
     try {
@@ -417,6 +452,43 @@ let StudentHousingDBController = function () {
           {
             $addFields: {
               avgRating: { $avg: "$rating.rating" },
+            },
+          },
+        ])
+        .toArray();
+      return queryResult;
+    } finally {
+      // we have to close the database connection otherwise we will overload the mongodb service.
+      await client.close();
+    }
+  };
+
+  studentHousingDB.getRankedListingsByAuthorID = async (authorID) => {
+    let client;
+    try {
+      client = new MongoClient(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      await client.connect();
+      const db = client.db(DB_NAME);
+      const listingsCollection = db.collection("listings");
+      // we will be using the user's email as their username
+      const queryResult = await listingsCollection
+        .aggregate([
+          {
+            $match: {
+              authorID: authorID,
+            },
+          },
+          {
+            $addFields: {
+              avgRating: { $avg: "$rating.rating" },
+            },
+          },
+          {
+            $sort: {
+              avgRating: -1,
             },
           },
         ])

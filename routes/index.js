@@ -193,6 +193,54 @@ router.post("/listings/create", async function (req, res) {
   res.redirect("/");
 });
 
+// /* POST rank listing by rating. */
+router.post("/ranklisting", async function (req, res) {
+  console.log("Attempting GET /ranklisting");
+  // console.log("Attempting searches for GET /");
+
+  const listings = await studentHousingDB.getRankedListings();
+  // console.log(listings);
+  // console.log("got listings");
+
+  session = req.session;
+
+  if (session.userid) {
+    // console.log("got session " + session.userid);
+
+    let user = await studentHousingDB.getUserByUsername(session.userid);
+    // console.log("got user", user);
+
+    if (user.authorID != undefined) {
+      //const authorID = owner.authorID;
+      const authorID = user.authorID;
+      // console.log("owner session: ", req.session);
+      const ownerListings = await studentHousingDB.getRankedListingsByAuthorID(
+        authorID
+      );
+      console.log("render ownerHomePage");
+      res.render("ownerHomePage", {
+        title: "StudentHousingFinderOwnerHome",
+        listings: ownerListings,
+        username: user.username,
+        authorID: authorID,
+      });
+    } else {
+      console.log("render studentHomePage");
+      res.render("studentHomePage", {
+        title: "StudentHousingFinderStudentHome",
+        listings: listings,
+        username: user.username,
+        student: user.username,
+      });
+    }
+  } else {
+    console.log("render index");
+    res.render("index", {
+      title: "StudentHousingFinderHome",
+      listings: listings,
+    });
+  }
+});
 // /* POST create rating. */
 router.post("/createRating", async function (req, res) {
   // console.log("**attempting POST createRating");

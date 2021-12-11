@@ -19,6 +19,7 @@
     "http-errors": "~1.6.3",
     "mongodb": "^4.2.0",
     "morgan": "~1.9.1",
+    "redis": "^4.0.0",
     "sqlite": "^4.0.23",
     "sqlite3": "^5.0.2",
     "uuid": "^3.4.0"
