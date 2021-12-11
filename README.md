@@ -31,7 +31,7 @@ Ranking Listings
 
 ![Logo](screenshots/RankingListing.png)
 
-![image](https://user-images.githubusercontent.com/73091370/145693361-a7ca4396-8d8d-4bd6-a91f-abcc6a7d23dd.png)
+
 
 
 
