@@ -1,0 +1,33 @@
+{
+  "name": "studenthousingfinder",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./node_modules/nodemon/bin/nodemon.js ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^4.6.0",
+    "cookie-parser": "~1.4.4",
+    "css-star-rating": "^1.2.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "^4.16.4",
+    "express-session": "^1.17.2",
+    "express-validator": "^6.13.0",
+    "http-errors": "~1.6.3",
+    "mongodb": "^4.2.0",
+    "morgan": "~1.9.1",
+    "sqlite": "^4.0.23",
+    "sqlite3": "^5.0.2",
+    "uuid": "^3.4.0"
+  },
+  "devDependencies": {
+    "ejs-lint": "^1.2.1",
+    "eslint": "^8.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "nodemon": "^2.0.14",
+    "prettier": "^2.4.1"
+  }
+}

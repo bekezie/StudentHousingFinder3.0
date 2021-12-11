@@ -1,0 +1,62 @@
+<div>
+  <form action="/message/create" method="POST">
+    <div>
+      <label class="form-label"
+        >Message the owner:
+        <textarea
+          class="form-control"
+          id="message"
+          name="message"
+          rows="4"
+          placeholder="Hi, I am interested in this unit."
+        ></textarea
+        >
+      </label>
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="messageID"
+          name="messageID"
+          type="hidden"
+        />
+      </label>
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="receiver"
+          name="receiver"
+          type="hidden"
+          value="<%= owner.username %>"
+        />
+      </label>
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="sender"
+          name="sender"
+          type="hidden"
+          value="<%= username %>"
+        />
+      </label>
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="time"
+          name="time"
+          type="hidden"
+          value="<%= time %>"
+        />
+      </label>
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="listingID"
+          name="listingID"
+          type="hidden"
+          value="<%= listing.listingID %>"
+        />
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Message</button>
+  </form>
+</div>

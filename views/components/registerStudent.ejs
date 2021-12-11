@@ -1,0 +1,72 @@
+<h1>Student Registration👨‍🎓</h1>
+<form action="/auth/registerStudent" method="POST">
+  <div class="form-group">
+    <label for="fistName" class="form-label">First Name</label>
+    <input type="text" class="form-control" name="firstName" id="firstName" />
+  </div>
+  <div class="form-group">
+    <label for="lastName" class="form-label">Last Name</label>
+    <input type="text" class="form-control" name="lastName" id="lastName" />
+  </div>
+  <div class="form-group">
+    <label for="username" class="form-label">Username</label>
+    <input type="text" class="form-control" name="username" id="username" />
+  </div>
+  <div class="form-group">
+    <label for="password" class="form-label">Password</label>
+    <input type="password" class="form-control" name="password" id="password" />
+  </div>
+  <div class="form-group">
+    <label for="password" class="form-label">Confirm Password</label>
+    <input
+      type="password"
+      class="form-control"
+      name="confirmedpassword"
+      id="confirmedpassword"
+    />
+  </div>
+  <div class="form-group">
+    <label for="budget" class="form-label">Budget</label>
+    <input type="number" class="form-control" name="budget" id="budget" />
+  </div>
+  <div class="form-group">
+    <label for="classOf" class="form-label">Class Of</label>
+    <input
+      type="number"
+      class="form-control"
+      name="classOf"
+      id="classOf"
+      placeholder="example: 2022"
+    />
+  </div>
+  <br />
+  <div class="form-group">
+    <select id="school" name="schoolID">
+      <option>Select school</option>
+      <option value="1">NEU</option>
+      <option value="2">CCSF</option>
+      <option value="3">UCLA</option>
+      <option value="4">UCSB</option>
+      <option value="5">UCSD</option>
+      <option value="6">UCSC</option>
+      <option value="7">SLO</option>
+      <option value="8">UCSF</option>
+      <option value="9">USF</option>
+      <option value="10">CSM</option>
+    </select>
+  </div>
+  <br />
+  <div class="form-group">
+    <select id="season" name="semester">
+      <option>Select semester</option>
+      <option value="fall">fall</option>
+      <option value="winter">winter</option>
+      <option value="spring">spring</option>
+      <option value="summer">summer</option>
+    </select>
+  </div>
+  <br />
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<br />
+<p>Not a Student? <a href="/owner">Click Here To Register As Owner</a></p>

@@ -1,0 +1,37 @@
+<h2>Listings</h2>
+<ul>
+  <% listings.forEach(function (l) { %>
+  <a
+    href="/listings/update/<%= l.listingID%>"
+    class="
+      list-group-item list-group-item-action
+      d-flex
+      w-100
+      justify-content-between
+    "
+  >
+    <div>
+      <h2><%= l.title %></h2>
+      <h3><%= l.location %></h3>
+      <br />
+      <%= l.description %>
+      <br />
+      <% if (l.avgRating > 0) { %>
+      <h3>Overall Rating: <%=l.avgRating%></h3>
+      <% } else { %>
+      <h3>No Ratings Yet</h3>
+      <% } %>
+    </div>
+    <form action="/listings/delete" method="POST">
+      <input
+        type="hidden"
+        name="listingID"
+        id="listingID"
+        value="<%= l.listingID %>"
+      />
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </a>
+  <br />
+  <% })%>
+</ul>

@@ -1,0 +1,47 @@
+<div>
+  <div class="row">
+    Previous Messages:
+    <ul>
+      <% msgs.forEach(function (m) { %>
+      <div class="card text-white bg-dark mb-3" style="width: 18rem">
+        <% if(m.sender != owner.username) { %>
+        <div class="card-header">
+          <%= m.sender %>(You) said to <%= m.receiver %>:
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item text-center"><%= m.message %></li>
+          <li class="list-group-item text-end">at <%= m.time %></li>
+        </ul>
+        <form
+          class="text-center card-footer"
+          action="/message/delete"
+          method="POST"
+        >
+          <input
+            type="hidden"
+            name="listingID"
+            value="<%= listing.listingID %>"
+          />
+          <input
+            type="hidden"
+            name="messageID"
+            id="messageID"
+            value="<%= m.messageID %>"
+          />
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+        <% } else { %>
+        <div class="card-header">
+          <%= m.sender %> said to <%= m.receiver %>(You):
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item text-center"><%= m.message %></li>
+          <li class="list-group-item text-end">at <%= m.time %></li>
+        </ul>
+        <% } %>
+      </div>
+      <br />
+      <% })%>
+    </ul>
+  </div>
+</div>

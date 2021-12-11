@@ -1,0 +1,71 @@
+[{
+  "_id": {
+    "$oid": "619d9feada12623fcaa6f940"
+  },
+  "schoolID": "1",
+  "name": "Northeastern University",
+  "abbreviation": "NEU"
+},{
+  "_id": {
+    "$oid": "619da047da12623fcaa6f941"
+  },
+  "schoolID": "2",
+  "name": "City College of San Francisco",
+  "abbreviation": "CCSF"
+},{
+  "_id": {
+    "$oid": "619da07fda12623fcaa6f942"
+  },
+  "schoolID": "3",
+  "name": "University of California, Los Angeles",
+  "abbreviation": "UCLA"
+},{
+  "_id": {
+    "$oid": "619da0f9da12623fcaa6f943"
+  },
+  "schoolID": "4",
+  "abbreviation": "UCSB",
+  "name": "University of California, Santa Barbara"
+},{
+  "_id": {
+    "$oid": "619da1cdda12623fcaa6f944"
+  },
+  "schoolID": "5",
+  "name": "University of California, San Diego",
+  "abbreviation": "UCSD"
+},{
+  "_id": {
+    "$oid": "619da1feda12623fcaa6f945"
+  },
+  "schoolID": "6",
+  "name": "University of California, Santa Cruz",
+  "abbreviation": "UCSC"
+},{
+  "_id": {
+    "$oid": "619da222da12623fcaa6f946"
+  },
+  "schoolID": "7",
+  "name": "San Luis Obispo",
+  "abbreviation": "SLO"
+},{
+  "_id": {
+    "$oid": "619da25fda12623fcaa6f947"
+  },
+  "schoolID": "8",
+  "name": "University of California, San Francisco",
+  "abbreviation": "UCSF"
+},{
+  "_id": {
+    "$oid": "619da2b1da12623fcaa6f948"
+  },
+  "schoolID": "9",
+  "name": "University of San Francsico",
+  "abbreviation": "USF"
+},{
+  "_id": {
+    "$oid": "619da2d1da12623fcaa6f949"
+  },
+  "schoolID": "10",
+  "name": "College of San Mateo",
+  "abbreviation": "CSM"
+}]

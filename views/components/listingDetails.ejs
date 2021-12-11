@@ -1,0 +1,52 @@
+<h1 class="display-1"><%= listing.title %></h1>
+<div>
+  <br />
+  Location: <%= listing.location %>
+  <br />
+  Unit Type: <%= listing.unitType %>
+  <br />
+  Size (Sqft): <%= listing.sizeInSqFt %>
+  <br />
+  Rent Per Month: <%= listing.rentPerMonth %>
+  <br />
+  Description: <%= listing.description %>
+  <br />
+  Opening Date: <%= listing.openingDate %>
+  <br />
+  Lease Term (Months): <%= listing.leaseInMonths %>
+  <br />
+  Available: <%= listing.available %>
+  <br />
+  Owner: <%= owner.firstName %> <%= owner.lastName %><br />
+  <% if (rating != undefined && rating != "" ) { %> My Rating: <%= rating[0].rating %>
+  <form action="/updateRating" method="POST">
+    <label class="form-label">1</label>
+    <input type="radio" id="rating" name="rating" value=1 />
+    <label class="form-label">2</label>
+    <input type="radio" id="rating" name="rating" value=2 />
+    <label class="form-label">3</label>
+    <input type="radio" id="rating" name="rating" value=3 />
+    <label class="form-label">4</label>
+    <input type="radio" id="rating" name="rating" value=4 />
+    <label class="form-label">5</label>
+    <input type="radio" id="rating" name="rating" value=5 />
+    <input type="hidden" name="listingID" value="<%= listing.listingID %>" />
+    <button type="submit" class="btn btn-primary">Update</button>
+  </form>
+  <%} else { %> No Rating:
+  <form action="/createRating" method="POST">
+    <label class="form-label">1</label>
+    <input type="radio" id="rating" name="rating" value=1 />
+    <label class="form-label">2</label>
+    <input type="radio" id="rating" name="rating" value=2 />
+    <label class="form-label">3</label>
+    <input type="radio" id="rating" name="rating" value=3 />
+    <label class="form-label">4</label>
+    <input type="radio" id="rating" name="rating" value=4 />
+    <label class="form-label">5</label>
+    <input type="radio" id="rating" name="rating" value=5 />
+    <input type="hidden" name="listingID" value="<%= listing.listingID %>" />
+    <button type="submit" class="btn btn-primary">Create</button>
+  </form>
+  <% } %>
+</div>

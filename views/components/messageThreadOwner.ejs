@@ -1,0 +1,88 @@
+<ul>
+  <% msgs.forEach(function (m) { %>
+  <div class="card text-white bg-dark mb-3" style="width: 18rem">
+    <% if(m.sender == username) { %>
+    <div class="card-header">
+      <%= m.sender %>(You) said to <%= m.receiver %>:
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item text-center"><%= m.message %></li>
+      <li class="list-group-item text-end">at <%= m.time %></li>
+    </ul>
+    <form
+      class="text-center card-footer"
+      action="/message/owner/delete"
+      method="POST"
+    >
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="messageID"
+          name="messageID"
+          type="hidden"
+          value="<%= m.messageID %>"
+        />
+      </label>
+      <input type="hidden" name="username" value="<%= username %>" />
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    <% } else { %>
+    <div class="card-header">
+      <%= m.sender %> said to <%= m.receiver %>(You):
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item text-center"><%= m.message %></li>
+      <li class="list-group-item text-end">at <%= m.time %></li>
+    </ul>
+    <form class="text-center card-footer" action="/message/reply" method="POST">
+      <label class="form-label"
+        >Reply back:
+        <textarea
+          class="form-control"
+          id="message"
+          name="message"
+          rows="3"
+        ></textarea>
+      </label>
+      <label class="form-label">
+        <input
+          type="hidden"
+          name="receiver"
+          id="receiver"
+          value="<%= m.sender %>"
+        />
+      </label>
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="sender"
+          name="sender"
+          type="hidden"
+          value="<%= m.receiver %>"
+        />
+      </label>
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="listingID"
+          name="listingID"
+          type="hidden"
+          value="<%= m.listingID %>"
+        />
+      </label>
+      <label class="form-label">
+        <input
+          class="form-control"
+          id="time"
+          name="time"
+          type="hidden"
+          value="<%= time %>"
+        />
+      </label>
+      <button type="submit" class="btn btn-primary">Reply</button>
+    </form>
+    <% } %>
+  </div>
+  <br />
+  <% })%>
+</ul>

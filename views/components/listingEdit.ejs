@@ -1,0 +1,129 @@
+<form action="/listings/update" method="POST">
+  <div>
+    <label class="form-label">
+      <input
+        class="form-control"
+        id="listingID"
+        name="listingID"
+        type="hidden"
+        value="<%= listing.listingID %>"
+      />
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Title:
+      <input
+        class="form-control"
+        name="title"
+        type="text"
+        value="<%= listing.title %>"
+        required
+      />
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Location:
+      <input
+        class="form-control"
+        name="location"
+        type="text"
+        value="<%= listing.location %>"
+        required
+      />
+    </label>
+  </div>
+  <div>
+    <label for="unitType" class="form-label"
+      >Unit type:
+      <select class="form-select" id="unitType" name="unitType">
+        <option value="dorm">Dorm</option>
+        <option value="apartment">Apartment</option>
+      </select>
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Size (Sqft):
+      <input
+        class="form-control"
+        name="sizeInSqFt"
+        type="number"
+        placeholder="550"
+        value="<%= listing.sizeInSqFt %>"
+        required
+      />
+    </label>
+  </div>
+
+  <div>
+    <label class="form-label"
+      >Rent (Per month):
+      <input
+        class="form-control"
+        name="rentPerMonth"
+        type="number"
+        placeholder="1000"
+        value="<%= listing.rentPerMonth %>"
+      />
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Description:
+      <textarea
+        class="form-control"
+        id="description"
+        name="description"
+        rows="4"
+      >
+<%= listing.description %></textarea
+      >
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Opening Date:
+      <input
+        class="form-control"
+        name="openingDate"
+        type="date"
+        value="<%= listing.openingDate %>"
+      />
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Lease Term (Months):
+      <input
+        class="form-control"
+        name="leaseInMonths"
+        type="number"
+        placeholder="6"
+        value="<%= listing.leaseInMonths %>"
+      />
+    </label>
+  </div>
+  <div>
+    <label for="available" class="form-label"
+      >Available:
+      <select class="form-select" id="available" name="available">
+        <option value="TRUE">Yes</option>
+        <option value="FALSE">No</option>
+      </select>
+    </label>
+  </div>
+  <div>
+    <label class="form-label">
+      <input
+        class="form-control"
+        name="authorID"
+        type="hidden"
+        value="<%= listing.authorID %>"
+        required
+      />
+    </label>
+  </div>
+  <button type="submit" class="btn btn-primary">Update Listing</button>
+</form>

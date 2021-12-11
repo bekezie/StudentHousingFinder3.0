@@ -1,0 +1,104 @@
+<h2>Create Listing</h2>
+<form action="/listings/create" method="POST">
+  <div>
+    <label class="form-label"
+      >Title:
+      <input class="form-control" name="title" type="text" required />
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Location:
+      <input class="form-control" name="location" type="text" required />
+    </label>
+  </div>
+  <div>
+    <label for="unitType" class="form-label"
+      >Unit type:
+      <select class="form-select" id="unitType" name="unitType">
+        <option value="dorm">Dorm</option>
+        <option value="apartment">Apartment</option>
+      </select>
+    </label>
+    <input
+      class="form-control"
+      id="criteria"
+      name="criteria"
+      type="hidden"
+      value="unitType"
+    />
+  </div>
+  <div>
+    <label class="form-label"
+      >Size (Sqft):
+      <input
+        class="form-control"
+        name="sizeInSqFt"
+        type="number"
+        placeholder="550"
+        required
+      />
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Rent (Per month):
+      <input
+        class="form-control"
+        name="offer"
+        type="number"
+        placeholder="1000"
+      />
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Description:
+      <textarea
+        class="form-control"
+        id="description"
+        name="description"
+        rows="4"
+        placeholder="Please provide a short description of the unit."
+      ></textarea>
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Opening Date:
+      <input class="form-control" name="openingDate" type="date" />
+    </label>
+  </div>
+  <div>
+    <label class="form-label"
+      >Lease Term (Months):
+      <input
+        class="form-control"
+        name="leaseInMonths"
+        type="number"
+        value="6"
+      />
+    </label>
+  </div>
+  <div>
+    <label for="available" class="form-label"
+      >Available:
+      <select class="form-select" id="available" name="available">
+        <option value="TRUE">Yes</option>
+        <option value="FALSE">No</option>
+      </select>
+    </label>
+  </div>
+  <div>
+    <label class="form-label">
+      <input
+        class="form-control"
+        id="authorID"
+        name="authorID"
+        type="hidden"
+        value="<% authorID %>"
+      />
+    </label>
+  </div>
+  <button type="submit" class="btn btn-primary">Create</button>
+</form>
