@@ -199,7 +199,6 @@ router.post("/ranklisting", async function (req, res) {
   // console.log("Attempting searches for GET /");
 
   let listings = await studentHousingDB.getsortedlistings();
-  console.log(listings);
   if (listings.length > 0) {
   } else {
     //console.log(listings);
@@ -207,6 +206,7 @@ router.post("/ranklisting", async function (req, res) {
     const rankedlistings = await studentHousingDB.getRankedListings();
 
     for (let i = 0; i < rankedlistings.length; i++) {
+      console.log("iterations " + i);
       //increments count by 1
       await studentHousingDB.addscore();
       //creates object of listing object

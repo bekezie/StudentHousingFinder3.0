@@ -762,6 +762,7 @@ let StudentHousingDBController = function () {
       await redisclient.connect();
 
       let score = await redisclient.get("score");
+      console.log("score " + score);
       await redisclient.hSet(
         `listing:${listing.listingID}:${listing.authorID}`,
         {
@@ -781,10 +782,15 @@ let StudentHousingDBController = function () {
         }
       );
 
-      await redisclient.zAdd("rankedlistings", {
-        score: score,
-        value: `listing:${listing.listingID}:${listing.authorID}`,
-      });
+      // let newlisting = await redisclient.hGet(
+      //   `listing:${listing.listingID}:${listing.authorID}`
+      // );
+      // console.log("GET " + newlisting);
+
+      // await redisclient.zAdd("rankedlistings", {
+      //   score: score,
+      //   value: newlisting,
+      // });
     } catch (err) {
       console.log(err, "listing objects");
     } finally {
@@ -800,10 +806,10 @@ let StudentHousingDBController = function () {
       let sortedlisting = await redisclient.zRange("rankedlistings", 0, -1);
       let result = [];
 
+      console.log("length " + sortedlisting.length);
+
       for (let i = 0; i < sortedlisting.length; i++) {
-        let listing = await redisclient.hGet(
-          `listing:${sortedlisting[i].value}`
-        );
+        let listing = await redisclient.hGet(`${sortedlisting[i].value}`);
         console.log(listing);
         result.push(listing);
       }
