@@ -14,6 +14,29 @@ It will support:
 - CRUD user information
 - Users can rate dorm/apartment listings
 
+Functionalities for in-memory key-value storage will support:
+- CRUD dorm/apartment listings
+- Ranking list for listings based on highest rating ranking 
+- Filtering system for rendering available and unavailable listings separately to the browser when called for both owners and students
+
+
+In-memory key-value storage data structures used:
+
+Ranking Listings
+- Hash Set and Sorted Set will be used for ranking listings with highest ratings. 
+
+- Will use a Hash Set to store listings key-value pairs. We will provide an attribute score to keep track of the rank of each listing object and reference it’s key in a sorted set. 
+
+- To get the score of a listing a String count will be used.
+
+- By doing so we can call each listing object by its key in a sorted set which is ordered by the score attribute from each listing object.
+
+![Logo](screenshots/RankingListing.png)
+
+
+
+
+
 ## Installation and Execution
 
 1. Clone the repository
