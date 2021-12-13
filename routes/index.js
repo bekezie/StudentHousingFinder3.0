@@ -198,23 +198,13 @@ router.post("/ranklisting", async function (req, res) {
   console.log("Attempting GET /ranklisting");
   // console.log("Attempting searches for GET /");
 
-  let listings = await studentHousingDB.getsortedlistings();
-  if (listings.length > 0) {
-  } else {
+  let redislistings = await studentHousingDB.getsortedlistings();
+  if (redislistings.length > 0) {
     //console.log(listings);
     console.log("got listings");
-    const rankedlistings = await studentHousingDB.getRankedListings();
-
-    for (let i = 0; i < rankedlistings.length; i++) {
-      console.log("iterations " + i);
-      //increments count by 1
-      await studentHousingDB.addscore();
-      //creates object of listing object
-      await studentHousingDB.createlisting(rankedlistings[i]);
-    }
     //get listing refrence, sorted by score ranking of highest rating
-    listings = await studentHousingDB.getsortedlistings();
-    console.log(listings);
+    mongolistings = await studentHousingDB.getsortedlistings();
+    console.log(mongolistings);
 
     session = req.session;
 
@@ -241,7 +231,7 @@ router.post("/ranklisting", async function (req, res) {
         console.log("render studentHomePage");
         res.render("studentHomePage", {
           title: "StudentHousingFinderStudentHome",
-          listings: listings,
+          listings: redislistings,
           username: user.username,
           student: user.username,
         });
@@ -250,9 +240,67 @@ router.post("/ranklisting", async function (req, res) {
       console.log("render index");
       res.render("index", {
         title: "StudentHousingFinderHome",
-        listings: listings,
+        listings: redislistings,
       });
     }
+
+    console.log("Got Ranked Listing from Redis!");
+  } else {
+    console.log("got listings");
+    const mongolistings = await studentHousingDB.getRankedListings();
+
+    for (let i = 0; i < mongolistings.length; i++) {
+      console.log("iterations " + i);
+      //increments count by 1
+      //await studentHousingDB.addscore();
+      //creates object of listing object
+      console.log(mongolistings[i]);
+      await studentHousingDB.createlisting(mongolistings[i]);
+      //break;
+    }
+    //get listing refrence, sorted by score ranking of highest rating
+
+    redislistings = await studentHousingDB.getsortedlistings();
+    console.log(redislistings);
+
+    session = req.session;
+
+    if (session.userid) {
+      // console.log("got session " + session.userid);
+
+      let user = await studentHousingDB.getUserByUsername(session.userid);
+      // console.log("got user", user);
+
+      if (user.authorID != undefined) {
+        //const authorID = owner.authorID;
+        const authorID = user.authorID;
+
+        const ownerListings =
+          await studentHousingDB.getRankedListingsByAuthorID(authorID);
+        console.log("render ownerHomePage");
+        res.render("ownerHomePage", {
+          title: "StudentHousingFinderOwnerHome",
+          listings: ownerListings,
+          username: user.username,
+          authorID: authorID,
+        });
+      } else {
+        console.log("render studentHomePage");
+        res.render("studentHomePage", {
+          title: "StudentHousingFinderStudentHome",
+          listings: mongolistings,
+          username: user.username,
+          student: user.username,
+        });
+      }
+    } else {
+      console.log("render index");
+      res.render("index", {
+        title: "StudentHousingFinderHome",
+        listings: mongolistings,
+      });
+    }
+    console.log("Ranked Listings have been set! Data retrival from mongodb.");
   }
 });
 // /* POST create rating. */
