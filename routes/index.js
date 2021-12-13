@@ -198,47 +198,61 @@ router.post("/ranklisting", async function (req, res) {
   console.log("Attempting GET /ranklisting");
   // console.log("Attempting searches for GET /");
 
-  const listings = await studentHousingDB.getRankedListings();
-  // console.log(listings);
-  // console.log("got listings");
+  let listings = await studentHousingDB.getsortedlistings();
+  console.log(listings);
+  if (listings.length > 0) {
+  } else {
+    //console.log(listings);
+    console.log("got listings");
+    const rankedlistings = await studentHousingDB.getRankedListings();
 
-  session = req.session;
+    for (let i = 0; i < rankedlistings.length; i++) {
+      //increments count by 1
+      await studentHousingDB.addscore();
+      //creates object of listing object
+      await studentHousingDB.createlisting(rankedlistings[i]);
+    }
+    //get listing refrence, sorted by score ranking of highest rating
+    listings = await studentHousingDB.getsortedlistings();
+    console.log(listings);
 
-  if (session.userid) {
-    // console.log("got session " + session.userid);
+    session = req.session;
 
-    let user = await studentHousingDB.getUserByUsername(session.userid);
-    // console.log("got user", user);
+    if (session.userid) {
+      // console.log("got session " + session.userid);
 
-    if (user.authorID != undefined) {
-      //const authorID = owner.authorID;
-      const authorID = user.authorID;
-      // console.log("owner session: ", req.session);
-      const ownerListings = await studentHousingDB.getRankedListingsByAuthorID(
-        authorID
-      );
-      console.log("render ownerHomePage");
-      res.render("ownerHomePage", {
-        title: "StudentHousingFinderOwnerHome",
-        listings: ownerListings,
-        username: user.username,
-        authorID: authorID,
-      });
+      let user = await studentHousingDB.getUserByUsername(session.userid);
+      // console.log("got user", user);
+
+      if (user.authorID != undefined) {
+        //const authorID = owner.authorID;
+        const authorID = user.authorID;
+
+        const ownerListings =
+          await studentHousingDB.getRankedListingsByAuthorID(authorID);
+        console.log("render ownerHomePage");
+        res.render("ownerHomePage", {
+          title: "StudentHousingFinderOwnerHome",
+          listings: ownerListings,
+          username: user.username,
+          authorID: authorID,
+        });
+      } else {
+        console.log("render studentHomePage");
+        res.render("studentHomePage", {
+          title: "StudentHousingFinderStudentHome",
+          listings: listings,
+          username: user.username,
+          student: user.username,
+        });
+      }
     } else {
-      console.log("render studentHomePage");
-      res.render("studentHomePage", {
-        title: "StudentHousingFinderStudentHome",
+      console.log("render index");
+      res.render("index", {
+        title: "StudentHousingFinderHome",
         listings: listings,
-        username: user.username,
-        student: user.username,
       });
     }
-  } else {
-    console.log("render index");
-    res.render("index", {
-      title: "StudentHousingFinderHome",
-      listings: listings,
-    });
   }
 });
 // /* POST create rating. */

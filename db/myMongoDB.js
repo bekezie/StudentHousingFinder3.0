@@ -740,6 +740,81 @@ let StudentHousingDBController = function () {
     }
   };
 
+  /*
+   ***************Redis Listing CRUD OPERATIONS*********************
+   */
+  studentHousingDB.addscore = async () => {
+    const redisclient = createClient();
+    try {
+      await redisclient.connect();
+      await redisclient.incr("score");
+    } catch (err) {
+      console.log(err, "score");
+    } finally {
+      await redisclient.quit();
+    }
+  };
+
+  studentHousingDB.createlisting = async (listing) => {
+    const redisclient = createClient();
+
+    try {
+      await redisclient.connect();
+
+      let score = await redisclient.get("score");
+      await redisclient.hSet(
+        `listing:${listing.listingID}:${listing.authorID}`,
+        {
+          listingID: `${listing.listingID}`,
+          title: listing.title,
+          location: listing.location,
+          unitType: listing.unitType,
+          sizeInSqFt: listing.sizeInSqFt,
+          rentPerMonth: listing.sizeInSqFt,
+          description: listing.description,
+          openingDate: listing.openingDate,
+          leaseInMonths: listing.leaseInMonths,
+          available: listing.available,
+          authorID: `${listing.authorID}`,
+          avgRating: `${listing.avgRating}`,
+          score: score,
+        }
+      );
+
+      await redisclient.zAdd("rankedlistings", {
+        score: score,
+        value: `listing:${listing.listingID}:${listing.authorID}`,
+      });
+    } catch (err) {
+      console.log(err, "listing objects");
+    } finally {
+      await redisclient.quit();
+    }
+  };
+
+  studentHousingDB.getsortedlistings = async () => {
+    const redisclient = createClient();
+
+    try {
+      await redisclient.connect();
+      let sortedlisting = await redisclient.zRange("rankedlistings", 0, -1);
+      let result = [];
+
+      for (let i = 0; i < sortedlisting.length; i++) {
+        let listing = await redisclient.hGet(
+          `listing:${sortedlisting[i].value}`
+        );
+        console.log(listing);
+        result.push(listing);
+      }
+      return result;
+    } catch (err) {
+      console.log(err, "sortedlisting");
+    } finally {
+      await redisclient.quit();
+    }
+  };
+
   return studentHousingDB;
 };
 
