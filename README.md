@@ -23,15 +23,14 @@ Functionalities for in-memory key-value storage will support:
 In-memory key-value storage data structures used:
 
 Ranking Listings
-- Hash Set and Sorted Set will be used for ranking listings with highest ratings. 
+- Strings, Hash Sets, and Sorted Sets will be used for ranking listings with highest ratings. 
 
-- Will use a Hash Set to store listings key-value pairs. We will provide an attribute score to keep track of the rank of each listing object and reference it’s key in a sorted set. 
+- Will use Hash Sets to store listings key-value pairs. We will provide an attribute score to keep track of the rank of each listing object and reference it’s key in a sorted set. 
 
 - To get the score of a listing a String count will be used.
 
 - By doing so we can call each listing object by its key in a sorted set which is ordered by the score attribute from each listing object.
 
-![Logo](screenshots/RankingListing.png)
 
 
 
