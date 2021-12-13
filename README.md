@@ -31,7 +31,6 @@ Ranking Listings
 
 - By doing so we can call each listing object by its key in a sorted set which is ordered by the score attribute from each listing object.
 
-![Logo](screenshots/RankingListing.png)
 
 
 
