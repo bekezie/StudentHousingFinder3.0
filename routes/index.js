@@ -283,7 +283,8 @@ router.post("/rankListing", async function (req, res) {
       //await studentHousingDB.addscore();
       //creates object of listing object
       console.log(mongoListings[i]);
-      await studentHousingDB.createRedisListing(mongoListings[i]);
+
+      await studentHousingDB.rankListing(mongoListings[i]);
       //break;
     }
     //get listing refrence, sorted by score ranking of highest rating

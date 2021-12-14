@@ -93,11 +93,13 @@ let StudentHousingDBController = function () {
 
   studentHousingDB.getOwnerByAuthorID = async authorID => {
     let client;
+
     try {
       client = new MongoClient(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
+
       await client.connect();
       const db = client.db(DB_NAME);
       const usersCollection = db.collection("users");
@@ -169,6 +171,8 @@ let StudentHousingDBController = function () {
   // // create new Listing
   studentHousingDB.createListing = async (newListing, authorID) => {
     let client;
+    const redisClient = createClient();
+
     try {
       client = new MongoClient(uri, {
         useUnifiedTopology: true,
@@ -176,6 +180,7 @@ let StudentHousingDBController = function () {
       });
 
       await client.connect();
+      await redisClient.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
 
@@ -212,6 +217,28 @@ let StudentHousingDBController = function () {
         available: newListing.available,
         authorID: authorID,
       };
+      let sortedListing = await redisClient.zRange("rankedListings", 0, -1);
+      //console.log(sortedListing);
+      if (sortedListing.length > 0) {
+        await redisClient.incr("score");
+        let score = await redisClient.get("score");
+        await redisClient.hSet(`listing:${listingID}:${authorID}`, {
+          listingID: `${listingID}`,
+          title: newListing.title,
+          location: newListing.location,
+          unitType: newListing.unitType,
+          sizeInSqFt: newListing.sizeInSqFt,
+          rentPerMonth: newListing.sizeInSqFt,
+          description: newListing.description,
+          openingDate: newListing.openingDate,
+          leaseInMonths: `${newListing.leaseInMonths}`,
+          available: newListing.available,
+          authorID: `${authorID}`,
+          avgRating: "null",
+          score: score,
+        });
+      }
+
       const insertResult = await listingsCollection.insertOne(newListingToAdd);
       return insertResult.insertedCount;
     } finally {
@@ -566,6 +593,7 @@ let StudentHousingDBController = function () {
         useUnifiedTopology: true,
       });
       await client.connect();
+
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
       const updateResult = await listingsCollection.updateOne(
@@ -583,6 +611,7 @@ let StudentHousingDBController = function () {
           },
         }
       );
+
       return updateResult;
     } finally {
       await client.close();
@@ -592,12 +621,14 @@ let StudentHousingDBController = function () {
   // // update Listing info
   studentHousingDB.updateListing = async listingToUpdate => {
     let client;
+    const redisClient = createClient();
     try {
       client = new MongoClient(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
       await client.connect();
+      await redisClient.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
       const updateResult = await listingsCollection.updateOne(
@@ -618,6 +649,39 @@ let StudentHousingDBController = function () {
           },
         }
       );
+
+      let sortedListing = await redisClient.zRange("rankedListings", 0, -1);
+      if (sortedListing.length > 0) {
+        //update listing object in redis
+        let score = await redisClient.hGet(
+          `listing:${listingToUpdate.listingID}:${listingToUpdate.authorID}`,
+          "score"
+        );
+        let avgRating = await redisClient.hGet(
+          `listing:${listingToUpdate.listingID}:${listingToUpdate.authorID}`,
+          "avgRating"
+        );
+
+        await redisClient.hSet(
+          `listing:${listingToUpdate.listingID}:${listingToUpdate.authorID}`,
+          {
+            listingID: `${listingToUpdate.listingID}`,
+            title: listingToUpdate.title,
+            location: listingToUpdate.location,
+            unitType: listingToUpdate.unitType,
+            sizeInSqFt: listingToUpdate.sizeInSqFt,
+            rentPerMonth: listingToUpdate.sizeInSqFt,
+            description: listingToUpdate.description,
+            openingDate: listingToUpdate.openingDate,
+            leaseInMonths: `${listingToUpdate.leaseInMonths}`,
+            available: listingToUpdate.available,
+            authorID: `${listingToUpdate.authorID}`,
+            avgRating: avgRating,
+            score: score,
+          }
+        );
+      }
+
       return updateResult;
     } finally {
       await client.close();
@@ -812,7 +876,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.createRedisListing = async listing => {
+  studentHousingDB.rankListing = async listing => {
     const redisClient = createClient();
 
     try {
