@@ -260,22 +260,6 @@ let StudentHousingDBController = function () {
 
       redisClient = createClient();
       await redisClient.connect();
-      await listingsCollection.find().forEach(async function (listing) {
-        await redisClient.hSet(`listing:${listing.listingID}`, {
-          listingID: `${listing.listingID}`,
-          title: listing.title,
-          location: listing.location,
-          unitType: listing.unitType,
-          sizeInSqFt: listing.sizeInSqFt,
-          rentPerMonth: listing.sizeInSqFt,
-          description: listing.description,
-          openingDate: listing.openingDate,
-          leaseInMonths: `${listing.leaseInMonths}`,
-          available: listing.available,
-          authorID: `${listing.authorID}`,
-          avgRating: `${listing.avgRating}`,
-        });
-      });
 
       const queryResult = await listingsCollection
         .aggregate([
@@ -314,6 +298,23 @@ let StudentHousingDBController = function () {
 
       redisClient = createClient();
       await redisClient.connect();
+
+      await listingsCollection.find().forEach(async function (listing) {
+        await redisClient.hSet(`listing:${listing.listingID}`, {
+          listingID: `${listing.listingID}`,
+          title: listing.title,
+          location: listing.location,
+          unitType: listing.unitType,
+          sizeInSqFt: listing.sizeInSqFt,
+          rentPerMonth: listing.sizeInSqFt,
+          description: listing.description,
+          openingDate: listing.openingDate,
+          leaseInMonths: `${listing.leaseInMonths}`,
+          available: listing.available,
+          authorID: `${listing.authorID}`,
+          avgRating: `${listing.avgRating}`,
+        });
+      });
 
       // delete if already exists
       await redisClient.del("availableListings");
