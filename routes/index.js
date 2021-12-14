@@ -194,17 +194,17 @@ router.post("/listings/create", async function (req, res) {
 });
 
 // /* POST rank listing by rating. */
-router.post("/ranklisting", async function (req, res) {
-  console.log("Attempting GET /ranklisting");
+router.post("/rankListing", async function (req, res) {
+  console.log("Attempting GET /rankListing");
   // console.log("Attempting searches for GET /");
 
-  let redislistings = await studentHousingDB.getsortedListings();
-  if (redislistings.length > 0) {
+  let redisListings = await studentHousingDB.getSortedListings();
+  if (redisListings.length > 0) {
     //console.log(listings);
     console.log("got listings");
     //get listing refrence, sorted by score ranking of highest rating
-    mongolistings = await studentHousingDB.getsortedListings();
-    console.log(mongolistings);
+    let mongoListings = await studentHousingDB.getSortedListings();
+    console.log(mongoListings);
 
     session = req.session;
 
@@ -231,7 +231,7 @@ router.post("/ranklisting", async function (req, res) {
         console.log("render studentHomePage");
         res.render("studentHomePage", {
           title: "StudentHousingFinderStudentHome",
-          listings: redislistings,
+          listings: redisListings,
           username: user.username,
           student: user.username,
         });
@@ -240,28 +240,28 @@ router.post("/ranklisting", async function (req, res) {
       console.log("render index");
       res.render("index", {
         title: "StudentHousingFinderHome",
-        listings: redislistings,
+        listings: redisListings,
       });
     }
 
     console.log("Got Ranked Listing from Redis!");
   } else {
     console.log("got listings");
-    const mongolistings = await studentHousingDB.getRankedListings();
+    const mongoListings = await studentHousingDB.getRankedListings();
 
-    for (let i = 0; i < mongolistings.length; i++) {
+    for (let i = 0; i < mongoListings.length; i++) {
       console.log("iterations " + i);
       //increments count by 1
       //await studentHousingDB.addscore();
       //creates object of listing object
-      console.log(mongolistings[i]);
-      await studentHousingDB.createListing(mongolistings[i]);
+      console.log(mongoListings[i]);
+      await studentHousingDB.rankListing(mongoListings[i]);
       //break;
     }
     //get listing refrence, sorted by score ranking of highest rating
 
-    redislistings = await studentHousingDB.getsortedListings();
-    console.log(redislistings);
+    redisListings = await studentHousingDB.getSortedListings();
+    console.log(redisListings);
 
     session = req.session;
 
@@ -288,7 +288,7 @@ router.post("/ranklisting", async function (req, res) {
         console.log("render studentHomePage");
         res.render("studentHomePage", {
           title: "StudentHousingFinderStudentHome",
-          listings: mongolistings,
+          listings: mongoListings,
           username: user.username,
           student: user.username,
         });
@@ -297,7 +297,7 @@ router.post("/ranklisting", async function (req, res) {
       console.log("render index");
       res.render("index", {
         title: "StudentHousingFinderHome",
-        listings: mongolistings,
+        listings: mongoListings,
       });
     }
     console.log("Ranked Listings have been set! Data retrival from mongodb.");
