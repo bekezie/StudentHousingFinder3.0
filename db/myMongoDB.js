@@ -747,7 +747,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.createlisting = async (listing) => {
+  studentHousingDB.createListing = async (listing) => {
     const redisClient = createClient();
 
     try {
@@ -791,7 +791,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.getsortedlistings = async () => {
+  studentHousingDB.getsortedListings = async () => {
     const redisClient = createClient();
 
     try {

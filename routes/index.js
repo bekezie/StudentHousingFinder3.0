@@ -198,12 +198,12 @@ router.post("/ranklisting", async function (req, res) {
   console.log("Attempting GET /ranklisting");
   // console.log("Attempting searches for GET /");
 
-  let redislistings = await studentHousingDB.getsortedlistings();
+  let redislistings = await studentHousingDB.getsortedListings();
   if (redislistings.length > 0) {
     //console.log(listings);
     console.log("got listings");
     //get listing refrence, sorted by score ranking of highest rating
-    mongolistings = await studentHousingDB.getsortedlistings();
+    mongolistings = await studentHousingDB.getsortedListings();
     console.log(mongolistings);
 
     session = req.session;
@@ -255,12 +255,12 @@ router.post("/ranklisting", async function (req, res) {
       //await studentHousingDB.addscore();
       //creates object of listing object
       console.log(mongolistings[i]);
-      await studentHousingDB.createlisting(mongolistings[i]);
+      await studentHousingDB.createListing(mongolistings[i]);
       //break;
     }
     //get listing refrence, sorted by score ranking of highest rating
 
-    redislistings = await studentHousingDB.getsortedlistings();
+    redislistings = await studentHousingDB.getsortedListings();
     console.log(redislistings);
 
     session = req.session;
