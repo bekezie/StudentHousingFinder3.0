@@ -157,7 +157,6 @@ router.post("/listings/available", async function (req, res) {
         res.render("studentHomePage", {
           title: "StudentHousingFinderStudentHome",
           listings: available,
-          available: available,
           username: user.username,
           student: user.firstName,
         });
@@ -396,7 +395,7 @@ router.get("/listings/:listingID", async function (req, res) {
     // console.log("Got listing details ", listingID);
 
     const listing = await studentHousingDB.getListingByID(listingID);
-    // console.log("Got listing by ID ", listing);
+    console.log("Got listing by ID ", listing);
 
     // const studObj = {
     //   listingID: listingID,

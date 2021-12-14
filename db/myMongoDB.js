@@ -299,6 +299,10 @@ let StudentHousingDBController = function () {
       redisClient = createClient();
       await redisClient.connect();
 
+      // delete if already exists
+      await redisClient.del("availableListings");
+      await redisClient.del("unavailableListings");
+
       await listingsCollection.find().forEach(async function (listing) {
         await redisClient.hSet(`listing:${listing.listingID}`, {
           listingID: `${listing.listingID}`,
@@ -316,11 +320,8 @@ let StudentHousingDBController = function () {
         });
       });
 
-      // delete if already exists
-      await redisClient.del("availableListings");
-      await redisClient.del("unavailableListings");
       await listingsCollection.find().forEach(async function (listing) {
-        if (listing.available == "true") {
+        if (listing.available) {
           await redisClient.rPush("availableListings", `${listing.listingID}`);
         } else {
           await redisClient.rPush(
@@ -426,7 +427,7 @@ let StudentHousingDBController = function () {
       await client.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
-      // we will be using the user's email as their username
+      // console.log(`attempting to get listing with ${listingID}`);
 
       const queryResult = await listingsCollection
         .aggregate([
@@ -436,7 +437,6 @@ let StudentHousingDBController = function () {
               //"rating.raterID": user,
             },
           },
-
           {
             $project: {
               rating: {
@@ -451,7 +451,11 @@ let StudentHousingDBController = function () {
         ])
         .toArray();
 
+      // console.log(`got listing with ${listingID}`);
+
       return queryResult[0].rating;
+    } catch (err) {
+      console.log(`unsuccessful get listing with ${listingID}`, err);
     } finally {
       // we have to close the database connection otherwise we will overload the mongodb service.
       await client.close();
@@ -546,11 +550,11 @@ let StudentHousingDBController = function () {
       await client.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
-      // console.log("attempting to get listings");
-      // we will be using the user's email as their username
+      console.log("attempting to get listings");
       const queryResult = await listingsCollection.findOne({
         listingID: listingID,
       });
+      console.log("got listings");
       return queryResult;
     } finally {
       // we have to close the database connection otherwise we will overload the mongodb service.
@@ -569,7 +573,6 @@ let StudentHousingDBController = function () {
       await client.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
-      // we will be using the user's email as their username
       const queryResult = await listingsCollection
         .aggregate([
           {
