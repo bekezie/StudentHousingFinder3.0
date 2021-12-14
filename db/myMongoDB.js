@@ -656,20 +656,28 @@ let StudentHousingDBController = function () {
     }
   };
 
-  // // delete Listing
-  studentHousingDB.deleteListing = async (listingToDelete) => {
+  // delete Listing
+  studentHousingDB.deleteListing = async (listingToDelete, authorID) => {
     let client;
+    const redisClient = createClient();
+
     try {
       client = new MongoClient(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
       await client.connect();
+      await redisClient.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
       const deleteResult = await listingsCollection.deleteOne({
         listingID: listingToDelete,
       });
+      await redisClient.zRem(
+        "rankedListings",
+        `listing:${listingToDelete}:${authorID}`
+      );
+      await redisClient.del(`listing:${listingToDelete}:${authorID}`);
       return deleteResult;
     } finally {
       client.close();

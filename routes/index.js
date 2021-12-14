@@ -454,12 +454,13 @@ router.post("/listings/delete", async function (req, res) {
   // console.log("**attempting POST delete listing");
 
   const listingID = req.body.listingID;
+  const authorID = req.body.authorID;
   // console.log(listingID);
   // console.log("delete listing", listingID);
   session = req.session;
 
   try {
-    await studentHousingDB.deleteListing(listingID);
+    await studentHousingDB.deleteListing(listingID, authorID);
     // console.log("Listing deleted");
   } catch (err) {
     // console.log("Listing not deleted");
