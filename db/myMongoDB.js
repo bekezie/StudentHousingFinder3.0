@@ -333,14 +333,14 @@ let StudentHousingDBController = function () {
 
   // search Listings , may implement pagination later
   studentHousingDB.searchListings = async searchCriteria => {
-    let client;
+    let mongoClient, redisClient;
     try {
-      client = new MongoClient(uri, {
+      mongoClient = new MongoClient(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
-      await client.connect();
-      const db = client.db(DB_NAME);
+      await mongoClient.connect();
+      const db = mongoClient.db(DB_NAME);
       const listingsCollection = db.collection("listings");
       if (searchCriteria != undefined) {
         try {
@@ -404,15 +404,35 @@ let StudentHousingDBController = function () {
         }
       }
     } finally {
-      client.close();
+      mongoClient.close();
     }
   };
 
   // // get available Listings -- INCOMPLETE
   studentHousingDB.getAvailableListings = async () => {
-    let redisClient = createClient();
+    let mongoClient, redisClient;
     try {
+      mongoClient = new MongoClient(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      await mongoClient.connect();
+      const db = mongoClient.db(DB_NAME);
+      const listingsCollection = db.collection("listings");
+
+      redisClient = createClient();
       await redisClient.connect();
+
+      await listingsCollection.find().forEach(async function (listing) {
+        if (listing.available) {
+          await redisClient.rPush("availableListings", `${listing.listingID}`);
+        } else {
+          await redisClient.rPush(
+            "unavailableListings",
+            `${listing.listingID}`
+          );
+        }
+      });
     } catch (err) {
       console.log("search unsuccessful", err);
     } finally {
@@ -788,10 +808,10 @@ let StudentHousingDBController = function () {
         }
       );
 
-      let newlisting = await redisClient.hGetAll(
+      let newListing = await redisClient.hGetAll(
         `listing:${listing.listingID}:${listing.authorID}`
       );
-      console.log(newlisting);
+      console.log(newListing);
       await redisClient.zAdd("rankedListings", {
         score: score,
         value: `listing:${listing.listingID}:${listing.authorID}`,
