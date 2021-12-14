@@ -163,6 +163,7 @@ let StudentHousingDBController = function () {
     }
   };
 
+  //  /*
   //  ***************Listing CRUD OPERATIONS*********************
   //  */
   // // create new Listing
@@ -735,7 +736,7 @@ let StudentHousingDBController = function () {
 
     try {
       await redisClient.connect();
-      let sortedListing = await redisClient.zRange("rankedlistings", 0, -1);
+      let sortedListing = await redisClient.zRange("rankedListings", 0, -1);
       let result = [];
 
       console.log("length " + sortedListing.length);
@@ -759,7 +760,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.createlisting = async listing => {
+  studentHousingDB.createListing = async listing => {
     const redisClient = createClient();
 
     try {
@@ -802,7 +803,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.getsortedlistings = async () => {
+  studentHousingDB.getSortedListings = async () => {
     const redisClient = createClient();
 
     try {
