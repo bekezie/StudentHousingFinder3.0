@@ -101,6 +101,40 @@ router.post("/search/Listing", async function (req, res) {
     console.log("got session " + session.userid);
 
     let user = await studentHousingDB.getUserByUsername(session.userid);
+    console.log("render studentHomePage ");
+    try {
+      res.render("studentHomePage", {
+        title: "StudentHousingFinderStudentHome",
+        listings: listings,
+        username: user.username,
+        student: user.firstName,
+      });
+    } catch (err) {
+      console.log("failed to render");
+    }
+  } else {
+    // console.log("render index");
+    res.render("index", {
+      title: "StudentHousingFinderHome",
+      listings: listings,
+    });
+  }
+});
+
+/* POST available listings page. */
+router.post("/listings/available", async function (req, res) {
+  console.log("Attempting POST /listings/available");
+
+  const listings = await studentHousingDB.getListings();
+  const available = await studentHousingDB.getAvailableListings();
+  console.log("got listings");
+
+  session = req.session;
+
+  if (session.userid) {
+    console.log("got session " + session.userid);
+
+    let user = await studentHousingDB.getUserByUsername(session.userid);
     // console.log("got user", user);
 
     if (user.authorID != undefined) {
@@ -118,16 +152,12 @@ router.post("/search/Listing", async function (req, res) {
         authorID: authorID,
       });
     } else {
-      // const student = await studentHousingDB.getStudentByUsername(
-      //   user.username
-      // );
-      // console.log("got student", student);
-
       console.log("render studentHomePage ");
       try {
         res.render("studentHomePage", {
           title: "StudentHousingFinderStudentHome",
-          listings: listings,
+          listings: available,
+          available: available,
           username: user.username,
           student: user.firstName,
         });
@@ -139,7 +169,7 @@ router.post("/search/Listing", async function (req, res) {
     // console.log("render index");
     res.render("index", {
       title: "StudentHousingFinderHome",
-      listings: listings,
+      listings: available,
     });
   }
 });
@@ -255,6 +285,7 @@ router.post("/rankListing", async function (req, res) {
       //await studentHousingDB.addscore();
       //creates object of listing object
       console.log(mongoListings[i]);
+
       await studentHousingDB.rankListing(mongoListings[i]);
       //break;
     }

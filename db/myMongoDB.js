@@ -30,7 +30,7 @@ let StudentHousingDBController = function () {
   // };
 
   //this function will save a new user to the database
-  studentHousingDB.createNewOwner = async (newUser) => {
+  studentHousingDB.createNewOwner = async newUser => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -73,7 +73,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.createNewStudent = async (newUser) => {
+  studentHousingDB.createNewStudent = async newUser => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -91,7 +91,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.getOwnerByAuthorID = async (authorID) => {
+  studentHousingDB.getOwnerByAuthorID = async authorID => {
     let client;
 
     try {
@@ -118,7 +118,7 @@ let StudentHousingDBController = function () {
   };
 
   // this function will query the database for a user object by using an username string
-  studentHousingDB.getUserByUsername = async (query) => {
+  studentHousingDB.getUserByUsername = async query => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -141,7 +141,7 @@ let StudentHousingDBController = function () {
   };
 
   // this function will query the database for a user object by using an username string and password
-  studentHousingDB.getUserCred = async (user) => {
+  studentHousingDB.getUserCred = async user => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -248,16 +248,35 @@ let StudentHousingDBController = function () {
 
   // get all Listings , may implement pagination later
   studentHousingDB.getListings = async () => {
-    let client;
+    let mongoClient, redisClient;
     try {
-      client = new MongoClient(uri, {
+      mongoClient = new MongoClient(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
-      await client.connect();
-      const db = client.db(DB_NAME);
+      await mongoClient.connect();
+      const db = mongoClient.db(DB_NAME);
       const listingsCollection = db.collection("listings");
-      // we will be using the user's email as their username
+
+      redisClient = createClient();
+      await redisClient.connect();
+      await listingsCollection.find().forEach(async function (listing) {
+        await redisClient.hSet(`listing:${listing.listingID}`, {
+          listingID: `${listing.listingID}`,
+          title: listing.title,
+          location: listing.location,
+          unitType: listing.unitType,
+          sizeInSqFt: listing.sizeInSqFt,
+          rentPerMonth: listing.sizeInSqFt,
+          description: listing.description,
+          openingDate: listing.openingDate,
+          leaseInMonths: `${listing.leaseInMonths}`,
+          available: listing.available,
+          authorID: `${listing.authorID}`,
+          avgRating: `${listing.avgRating}`,
+        });
+      });
+
       const queryResult = await listingsCollection
         .aggregate([
           {
@@ -277,7 +296,87 @@ let StudentHousingDBController = function () {
       console.log(err);
     } finally {
       // we have to close the database connection otherwise we will overload the mongodb service.
-      await client.close();
+      await mongoClient.close();
+    }
+  };
+
+  // // get available Listings
+  studentHousingDB.getAvailableListings = async () => {
+    let mongoClient, redisClient;
+    try {
+      mongoClient = new MongoClient(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      await mongoClient.connect();
+      const db = mongoClient.db(DB_NAME);
+      const listingsCollection = db.collection("listings");
+
+      redisClient = createClient();
+      await redisClient.connect();
+
+      // delete if already exists
+      await redisClient.del("availableListings");
+      await redisClient.del("unavailableListings");
+      await listingsCollection.find().forEach(async function (listing) {
+        if (listing.available == "true") {
+          await redisClient.rPush("availableListings", `${listing.listingID}`);
+        } else {
+          await redisClient.rPush(
+            "unavailableListings",
+            `${listing.listingID}`
+          );
+        }
+      });
+
+      let listings = [];
+
+      let availableIDs = await redisClient.lRange("availableListings", 0, -1);
+      // console.log("available", availableIDs);
+      for (let i = 0; i < (await redisClient.lLen("availableListings")); i++) {
+        let listing = await redisClient.hGetAll(`listing:${availableIDs[i]}`);
+        // console.log(`listing:${availableIDs[i]}: `, listing);
+        if (listing.listingID == availableIDs[i]) {
+          listings.push(JSON.parse(JSON.stringify(listing)));
+        }
+      }
+      console.log("available listings: ", listings);
+      return listings;
+    } catch (err) {
+      console.log("available unsuccessful", err);
+    } finally {
+      redisClient.quit();
+    }
+  };
+
+  // // get unavailable Listings
+  studentHousingDB.getUnavailableListings = async () => {
+    let redisClient;
+    try {
+      redisClient = createClient();
+      await redisClient.connect();
+
+      let listings = [];
+
+      let unavailableIDs = await redisClient.lRange(
+        "unavailableListings",
+        0,
+        -1
+      );
+      console.log("available", unavailableIDs);
+      for (let i = 0; i < (await redisClient.lLen("availableListings")); i++) {
+        let listing = await redisClient.hGetAll(`listing:${unavailableIDs[i]}`);
+        console.log(`listing:${unavailableIDs[i]}: `, listing);
+        if (listing.listingID == unavailableIDs[i]) {
+          listings.push(JSON.parse(JSON.stringify(listing)));
+        }
+      }
+      console.log("available listings: ", listings);
+      return listings;
+    } catch (err) {
+      console.log("available unsuccessful", err);
+    } finally {
+      redisClient.quit();
     }
   };
 
@@ -359,8 +458,8 @@ let StudentHousingDBController = function () {
   };
 
   // search Listings , may implement pagination later
-  studentHousingDB.searchListings = async (searchCriteria) => {
-    let mongoClient, redisClient;
+  studentHousingDB.searchListings = async searchCriteria => {
+    let mongoClient;
     try {
       mongoClient = new MongoClient(uri, {
         useNewUrlParser: true,
@@ -435,40 +534,8 @@ let StudentHousingDBController = function () {
     }
   };
 
-  // // get available Listings -- INCOMPLETE
-  studentHousingDB.getAvailableListings = async () => {
-    let mongoClient, redisClient;
-    try {
-      mongoClient = new MongoClient(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-      await mongoClient.connect();
-      const db = mongoClient.db(DB_NAME);
-      const listingsCollection = db.collection("listings");
-
-      redisClient = createClient();
-      await redisClient.connect();
-
-      await listingsCollection.find().forEach(async function (listing) {
-        if (listing.available) {
-          await redisClient.rPush("availableListings", `${listing.listingID}`);
-        } else {
-          await redisClient.rPush(
-            "unavailableListings",
-            `${listing.listingID}`
-          );
-        }
-      });
-    } catch (err) {
-      console.log("search unsuccessful", err);
-    } finally {
-      redisClient.quit();
-    }
-  };
-
   // // read selected Listing info
-  studentHousingDB.getListingByID = async (listingID) => {
+  studentHousingDB.getListingByID = async listingID => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -491,7 +558,7 @@ let StudentHousingDBController = function () {
   };
 
   // // read selected Listing info
-  studentHousingDB.getListingsByAuthorID = async (authorID) => {
+  studentHousingDB.getListingsByAuthorID = async authorID => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -523,7 +590,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.createRating = async (newRating) => {
+  studentHousingDB.createRating = async newRating => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -553,7 +620,7 @@ let StudentHousingDBController = function () {
   };
 
   // // update Listing info
-  studentHousingDB.updateRating = async (ratingToUpdate) => {
+  studentHousingDB.updateRating = async ratingToUpdate => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -587,7 +654,7 @@ let StudentHousingDBController = function () {
   };
 
   // // update Listing info
-  studentHousingDB.updateListing = async (listingToUpdate) => {
+  studentHousingDB.updateListing = async listingToUpdate => {
     let client;
     const redisClient = createClient();
     try {
@@ -688,7 +755,7 @@ let StudentHousingDBController = function () {
   //  ***************MESSAGE CRUD OPERATIONS*********************
   //  */
 
-  studentHousingDB.createMessage = async (newMessage) => {
+  studentHousingDB.createMessage = async newMessage => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -762,7 +829,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.getAllMessages = async (username) => {
+  studentHousingDB.getAllMessages = async username => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -787,7 +854,7 @@ let StudentHousingDBController = function () {
   };
 
   // delete Message
-  studentHousingDB.deleteMessage = async (messageToDelete) => {
+  studentHousingDB.deleteMessage = async messageToDelete => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -823,7 +890,7 @@ let StudentHousingDBController = function () {
   //   }
   // };
 
-  studentHousingDB.getRankedListingsByAuthorID = async (authorID) => {
+  studentHousingDB.getRankedListingsByAuthorID = async authorID => {
     const redisClient = createClient();
 
     try {
@@ -852,7 +919,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.rankListing = async (listing) => {
+  studentHousingDB.rankListing = async listing => {
     const redisClient = createClient();
 
     try {
