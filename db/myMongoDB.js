@@ -248,16 +248,35 @@ let StudentHousingDBController = function () {
 
   // get all Listings , may implement pagination later
   studentHousingDB.getListings = async () => {
-    let client;
+    let mongoClient, redisClient;
     try {
-      client = new MongoClient(uri, {
+      mongoClient = new MongoClient(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
-      await client.connect();
-      const db = client.db(DB_NAME);
+      await mongoClient.connect();
+      const db = mongoClient.db(DB_NAME);
       const listingsCollection = db.collection("listings");
-      // we will be using the user's email as their username
+
+      redisClient = createClient();
+      await redisClient.connect();
+      await listingsCollection.find().forEach(async function (listing) {
+        await redisClient.hSet(`listing:${listing.listingID}`, {
+          listingID: `${listing.listingID}`,
+          title: listing.title,
+          location: listing.location,
+          unitType: listing.unitType,
+          sizeInSqFt: listing.sizeInSqFt,
+          rentPerMonth: listing.sizeInSqFt,
+          description: listing.description,
+          openingDate: listing.openingDate,
+          leaseInMonths: `${listing.leaseInMonths}`,
+          available: listing.available,
+          authorID: `${listing.authorID}`,
+          avgRating: `${listing.avgRating}`,
+        });
+      });
+
       const queryResult = await listingsCollection
         .aggregate([
           {
@@ -277,7 +296,87 @@ let StudentHousingDBController = function () {
       console.log(err);
     } finally {
       // we have to close the database connection otherwise we will overload the mongodb service.
-      await client.close();
+      await mongoClient.close();
+    }
+  };
+
+  // // get available Listings
+  studentHousingDB.getAvailableListings = async () => {
+    let mongoClient, redisClient;
+    try {
+      mongoClient = new MongoClient(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      await mongoClient.connect();
+      const db = mongoClient.db(DB_NAME);
+      const listingsCollection = db.collection("listings");
+
+      redisClient = createClient();
+      await redisClient.connect();
+
+      // delete if already exists
+      await redisClient.del("availableListings");
+      await redisClient.del("unavailableListings");
+      await listingsCollection.find().forEach(async function (listing) {
+        if (listing.available == "true") {
+          await redisClient.rPush("availableListings", `${listing.listingID}`);
+        } else {
+          await redisClient.rPush(
+            "unavailableListings",
+            `${listing.listingID}`
+          );
+        }
+      });
+
+      let listings = [];
+
+      let availableIDs = await redisClient.lRange("availableListings", 0, -1);
+      // console.log("available", availableIDs);
+      for (let i = 0; i < (await redisClient.lLen("availableListings")); i++) {
+        let listing = await redisClient.hGetAll(`listing:${availableIDs[i]}`);
+        // console.log(`listing:${availableIDs[i]}: `, listing);
+        if (listing.listingID == availableIDs[i]) {
+          listings.push(JSON.parse(JSON.stringify(listing)));
+        }
+      }
+      console.log("available listings: ", listings);
+      return listings;
+    } catch (err) {
+      console.log("available unsuccessful", err);
+    } finally {
+      redisClient.quit();
+    }
+  };
+
+  // // get unavailable Listings
+  studentHousingDB.getUnavailableListings = async () => {
+    let redisClient;
+    try {
+      redisClient = createClient();
+      await redisClient.connect();
+
+      let listings = [];
+
+      let unavailableIDs = await redisClient.lRange(
+        "unavailableListings",
+        0,
+        -1
+      );
+      console.log("available", unavailableIDs);
+      for (let i = 0; i < (await redisClient.lLen("availableListings")); i++) {
+        let listing = await redisClient.hGetAll(`listing:${unavailableIDs[i]}`);
+        console.log(`listing:${unavailableIDs[i]}: `, listing);
+        if (listing.listingID == unavailableIDs[i]) {
+          listings.push(JSON.parse(JSON.stringify(listing)));
+        }
+      }
+      console.log("available listings: ", listings);
+      return listings;
+    } catch (err) {
+      console.log("available unsuccessful", err);
+    } finally {
+      redisClient.quit();
     }
   };
 
@@ -432,72 +531,6 @@ let StudentHousingDBController = function () {
       }
     } finally {
       mongoClient.close();
-    }
-  };
-
-  // // get available Listings
-  studentHousingDB.getAvailableListings = async () => {
-    let mongoClient, redisClient;
-    try {
-      mongoClient = new MongoClient(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-      await mongoClient.connect();
-      const db = mongoClient.db(DB_NAME);
-      const listingsCollection = db.collection("listings");
-
-      redisClient = createClient();
-      await redisClient.connect();
-
-      await listingsCollection.find().forEach(async function (listing) {
-        await redisClient.hSet(`listing:${listing.listingID}`, {
-          listingID: `${listing.listingID}`,
-          title: listing.title,
-          location: listing.location,
-          unitType: listing.unitType,
-          sizeInSqFt: listing.sizeInSqFt,
-          rentPerMonth: listing.sizeInSqFt,
-          description: listing.description,
-          openingDate: listing.openingDate,
-          leaseInMonths: `${listing.leaseInMonths}`,
-          available: listing.available,
-          authorID: `${listing.authorID}`,
-          avgRating: `${listing.avgRating}`,
-        });
-      });
-
-      // delete if already exists
-      await redisClient.del("availableListings");
-      await redisClient.del("unavailableListings");
-      await listingsCollection.find().forEach(async function (listing) {
-        if (listing.available == "true") {
-          await redisClient.rPush("availableListings", `${listing.listingID}`);
-        } else {
-          await redisClient.rPush(
-            "unavailableListings",
-            `${listing.listingID}`
-          );
-        }
-      });
-
-      let listings = [];
-
-      let availableIDs = await redisClient.lRange("availableListings", 0, -1);
-      // console.log("available", availableIDs);
-      for (let i = 0; i < (await redisClient.lLen("availableListings")); i++) {
-        let listing = await redisClient.hGetAll(`listing:${availableIDs[i]}`);
-        // console.log(`listing:${availableIDs[i]}: `, listing);
-        if (listing.listingID == availableIDs[i]) {
-          listings.push(JSON.parse(JSON.stringify(listing)));
-        }
-      }
-      console.log("available listings: ", listings);
-      return listings;
-    } catch (err) {
-      console.log("available unsuccessful", err);
-    } finally {
-      redisClient.quit();
     }
   };
 
