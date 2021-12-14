@@ -75,9 +75,14 @@
   </div> -->
   <button type="submit" class="btn btn-primary">Search</button>
 </form>
-<form action="/search/available" method="POST">
-  <button type="submit" class="btn btn-secondary">See Available</button>
-</form>
+<div>
+  <form action="/listings/available" method="POST">
+    <button type="submit" class="btn btn-secondary">See Only Available Units</button>
+  </form>
+  <form action="/" method="GET">
+    <button type="submit" class="btn btn-secondary">See All Units</button>
+  </form>
+</div>
 
 <form action="/rankListing" method="POST">
     <div>

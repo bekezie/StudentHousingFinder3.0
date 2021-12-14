@@ -435,7 +435,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  // // get available Listings -- INCOMPLETE
+  // // get available Listings
   studentHousingDB.getAvailableListings = async () => {
     let mongoClient, redisClient;
     try {
@@ -446,11 +446,9 @@ let StudentHousingDBController = function () {
       await mongoClient.connect();
       const db = mongoClient.db(DB_NAME);
       const listingsCollection = db.collection("listings");
-      console.log("listings: ", await listingsCollection.find().toArray());
 
       redisClient = createClient();
       await redisClient.connect();
-      await redisClient.del("availableListings");
 
       await listingsCollection.find().forEach(async function (listing) {
         await redisClient.hSet(`listing:${listing.listingID}`, {
@@ -469,11 +467,14 @@ let StudentHousingDBController = function () {
         });
       });
 
+      // delete if already exists
+      await redisClient.del("availableListings");
+      await redisClient.del("unavailableListings");
       await listingsCollection.find().forEach(async function (listing) {
-        if (listing.available) {
-          await redisClient.lPush("availableListings", `${listing.listingID}`);
+        if (listing.available == "true") {
+          await redisClient.rPush("availableListings", `${listing.listingID}`);
         } else {
-          await redisClient.lPush(
+          await redisClient.rPush(
             "unavailableListings",
             `${listing.listingID}`
           );
@@ -483,14 +484,15 @@ let StudentHousingDBController = function () {
       let listings = [];
 
       let availableIDs = await redisClient.lRange("availableListings", 0, -1);
-      console.log("available", availableIDs);
+      // console.log("available", availableIDs);
       for (let i = 0; i < (await redisClient.lLen("availableListings")); i++) {
         let listing = await redisClient.hGetAll(`listing:${availableIDs[i]}`);
-        console.log(`listing:${availableIDs[i]}: `, listing);
+        // console.log(`listing:${availableIDs[i]}: `, listing);
         if (listing.listingID == availableIDs[i]) {
-          listings.push(listing);
+          listings.push(JSON.parse(JSON.stringify(listing)));
         }
       }
+      console.log("available listings: ", listings);
       return listings;
     } catch (err) {
       console.log("available unsuccessful", err);

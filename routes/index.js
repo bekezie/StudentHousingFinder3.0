@@ -122,10 +122,11 @@ router.post("/search/Listing", async function (req, res) {
 });
 
 /* POST available listings page. */
-router.post("/search/available", async function (req, res) {
-  console.log("Attempting searches for POST /search/available");
+router.post("/listings/available", async function (req, res) {
+  console.log("Attempting POST /listings/available");
 
-  const listings = await studentHousingDB.getAvailableListings();
+  const listings = await studentHousingDB.getListings();
+  const available = await studentHousingDB.getAvailableListings();
   console.log("got listings");
 
   session = req.session;
@@ -155,7 +156,8 @@ router.post("/search/available", async function (req, res) {
       try {
         res.render("studentHomePage", {
           title: "StudentHousingFinderStudentHome",
-          listings: listings,
+          listings: available,
+          available: available,
           username: user.username,
           student: user.firstName,
         });
@@ -167,7 +169,7 @@ router.post("/search/available", async function (req, res) {
     // console.log("render index");
     res.render("index", {
       title: "StudentHousingFinderHome",
-      listings: listings,
+      listings: available,
     });
   }
 });
