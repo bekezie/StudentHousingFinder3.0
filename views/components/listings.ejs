@@ -1,9 +1,23 @@
 
 <% if (!available) { %>
 <h2>Listings</h2>
+<% if(rank) {%>
+  
+<h4>Ranked by Rating</h4>
+
+
+<%}%>
+
 <%} else { %>
 <h2>All Available Listings</h2>
+<% if(rank) {%>
+  
+<h4>Ranked by Rating</h4>
+
+
+<%}%>
 <% } %>
+
 <!-- Show Unavailable Listings -->
 <%- include("./availableListings.ejs") %>
 

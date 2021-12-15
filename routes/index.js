@@ -150,6 +150,7 @@ router.post("/listings/available", async function (req, res) {
         title: "StudentHousingFinderStudentHome",
         listings: available,
         available: true,
+        rank: false,
         username: user.username,
         student: user.firstName,
       });
@@ -162,6 +163,7 @@ router.post("/listings/available", async function (req, res) {
       title: "StudentHousingFinderHome",
       listings: available,
       available: false,
+      rank: false,
     });
   }
 });
@@ -191,6 +193,7 @@ router.post("/listings/unavailable", async function (req, res) {
         unavailable: true,
         username: user.username,
         authorID: authorID,
+        rank: false,
       });
     } catch (err) {
       console.log("failed to render");
@@ -201,6 +204,7 @@ router.post("/listings/unavailable", async function (req, res) {
       title: "StudentHousingFinderHome",
       listings: unavailable,
       unavailable: false,
+      rank: false,
     });
   }
 });
