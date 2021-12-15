@@ -462,13 +462,13 @@ let StudentHousingDBController = function () {
       await client.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
-      // console.log(`attempting to get listing with ${listingID}`);
+      console.log(`attempting to get listing with ${listingID}`);
 
       const queryResult = await listingsCollection
         .aggregate([
           {
             $match: {
-              listingID: listingID,
+              listingID: parseInt(listingID),
               //"rating.raterID": user,
             },
           },
@@ -579,10 +579,12 @@ let StudentHousingDBController = function () {
       const listingsCollection = db.collection("listings");
       console.log("attempting to get listings");
       const queryResult = await listingsCollection.findOne({
-        listingID: listingID,
+        listingID: parseInt(listingID),
       });
-      console.log("got listings");
+      console.log("queryResult", queryResult);
       return queryResult;
+    } catch (err) {
+      console.log("could not find", err);
     } finally {
       // we have to close the database connection otherwise we will overload the mongodb service.
       await client.close();

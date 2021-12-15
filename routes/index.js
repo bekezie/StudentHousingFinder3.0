@@ -384,7 +384,7 @@ router.post("/createRating", async function (req, res) {
   let rateInt = parseInt(req.body.rating, 10);
   const rating = {
     rating: rateInt,
-    listingID: req.body.listingID,
+    listingID: parseInt(req.body.listingID),
     user: session.userid,
   };
 
@@ -431,7 +431,7 @@ router.post("/updateRating", async function (req, res) {
   let rateInt = parseInt(req.body.rating, 10);
   const updatedrating = {
     rating: rateInt,
-    listingID: req.body.listingID,
+    listingID: parseInt(req.body.listingID),
     raterID: session.userid,
   };
   // console.log(updatedrating);
@@ -483,9 +483,9 @@ router.get("/listings/:listingID", async function (req, res) {
   session = req.session;
 
   if (session.userid != undefined) {
-    const listingID = req.params.listingID;
+    const listingID = parseInt(req.params.listingID);
 
-    // console.log("Got listing details ", listingID);
+    console.log("Got listing details ", listingID);
 
     const listing = await studentHousingDB.getListingByID(listingID);
     console.log("Got listing by ID ", listing);
@@ -497,17 +497,19 @@ router.get("/listings/:listingID", async function (req, res) {
     // console.log("listingID, user: ", listingID, session.userid);
 
     const rating = await studentHousingDB.getRatingByIDS(
-      listing.listingID,
+      parseInt(listing.listingID),
       session.userid
     );
 
     console.log("authorID:", parseInt(listing.authorID));
-    const owner = await studentHousingDB.getOwnerByAuthorID(listing.authorID);
+    const owner = await studentHousingDB.getOwnerByAuthorID(
+      listing.authorID.toString()
+    );
     console.log("Got owner ", owner);
     const msgs = await studentHousingDB.getMessages(
       session.userid,
       owner.username,
-      listing.listingID
+      parseInt(listing.listingID)
     );
 
     let time = new Date().toLocaleTimeString([], {
@@ -536,7 +538,7 @@ router.get("/listings/:listingID", async function (req, res) {
 router.get("/listings/update/:listingID", async function (req, res) {
   console.log("**attempting POST listings/update/ID");
 
-  const listingID = req.params.listingID;
+  const listingID = parseInt(req.params.listingID);
   // console.log("Got listing details ", listingID);
 
   const listing = await studentHousingDB.getListingByID(listingID);
@@ -576,7 +578,7 @@ router.post("/listings/update", async function (req, res) {
 router.post("/listings/delete", async function (req, res) {
   // console.log("**attempting POST delete listing");
 
-  const listingID = req.body.listingID;
+  const listingID = parseInt(req.body.listingID);
   const authorID = req.body.authorID;
   // console.log(listingID);
   // console.log("delete listing", listingID);
