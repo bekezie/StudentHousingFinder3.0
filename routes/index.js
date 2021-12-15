@@ -223,7 +223,7 @@ router.post("/listings/create", async function (req, res) {
 });
 
 // /* POST rank listing by rating. */
-router.post("/rankListing", async function (req, res) {
+router.get("/rankListing", async function (req, res) {
   console.log("Attempting GET /rankListing");
   // console.log("Attempting searches for GET /");
 
