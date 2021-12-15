@@ -30,7 +30,7 @@ let StudentHousingDBController = function () {
   // };
 
   //this function will save a new user to the database
-  studentHousingDB.createNewOwner = async (newUser) => {
+  studentHousingDB.createNewOwner = async newUser => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -73,7 +73,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.createNewStudent = async (newUser) => {
+  studentHousingDB.createNewStudent = async newUser => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -91,7 +91,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.getOwnerByAuthorID = async (authorID) => {
+  studentHousingDB.getOwnerByAuthorID = async authorID => {
     let client;
 
     try {
@@ -118,7 +118,7 @@ let StudentHousingDBController = function () {
   };
 
   // this function will query the database for a user object by using an username string
-  studentHousingDB.getUserByUsername = async (query) => {
+  studentHousingDB.getUserByUsername = async query => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -141,7 +141,7 @@ let StudentHousingDBController = function () {
   };
 
   // this function will query the database for a user object by using an username string and password
-  studentHousingDB.getUserCred = async (user) => {
+  studentHousingDB.getUserCred = async user => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -203,6 +203,11 @@ let StudentHousingDBController = function () {
 
       let listingID = 1 + parseInt(max[0].count, 10);
       // console.log(listingID);
+      if (newListing.available == "true") {
+        newListing.available = true;
+      } else {
+        newListing.available = false;
+      }
 
       const newListingToAdd = {
         listingID: listingID.toString(),
@@ -352,29 +357,59 @@ let StudentHousingDBController = function () {
   };
 
   // // get unavailable Listings
-  studentHousingDB.getUnavailableListings = async () => {
-    let redisClient;
+  studentHousingDB.getUnavailableListings = async authorID => {
+    let mongoClient, redisClient;
     try {
+      mongoClient = new MongoClient(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      await mongoClient.connect();
+      const db = mongoClient.db(DB_NAME);
+      const listingsCollection = db.collection("listings");
+
       redisClient = createClient();
       await redisClient.connect();
 
-      let listings = [];
+      // delete if already exists
+      await redisClient.del("availableListings");
+      await redisClient.del("unavailableListings");
+
+      await listingsCollection.find().forEach(async function (listing) {
+        if (listing.available) {
+          await redisClient.rPush("availableListings", `${listing.listingID}`);
+        } else {
+          await redisClient.rPush(
+            "unavailableListings",
+            `${listing.listingID}`
+          );
+        }
+      });
+
+      let unavailableListings = [];
 
       let unavailableIDs = await redisClient.lRange(
         "unavailableListings",
         0,
         -1
       );
-      console.log("available", unavailableIDs);
-      for (let i = 0; i < (await redisClient.lLen("availableListings")); i++) {
+      // console.log("unavailable", unavailableIDs);
+      for (
+        let i = 0;
+        i < (await redisClient.lLen("unavailableListings"));
+        i++
+      ) {
         let listing = await redisClient.hGetAll(`listing:${unavailableIDs[i]}`);
         console.log(`listing:${unavailableIDs[i]}: `, listing);
-        if (listing.listingID == unavailableIDs[i]) {
-          listings.push(JSON.parse(JSON.stringify(listing)));
+        if (
+          listing.listingID == unavailableIDs[i] &&
+          listing.authorID == authorID
+        ) {
+          unavailableListings.push(JSON.parse(JSON.stringify(listing)));
         }
       }
-      console.log("available listings: ", listings);
-      return listings;
+      console.log("unavailable listings: ", unavailableListings);
+      return unavailableListings;
     } catch (err) {
       console.log("available unsuccessful", err);
     } finally {
@@ -463,7 +498,7 @@ let StudentHousingDBController = function () {
   };
 
   // search Listings , may implement pagination later
-  studentHousingDB.searchListings = async (searchCriteria) => {
+  studentHousingDB.searchListings = async searchCriteria => {
     let mongoClient;
     try {
       mongoClient = new MongoClient(uri, {
@@ -540,7 +575,7 @@ let StudentHousingDBController = function () {
   };
 
   // // read selected Listing info
-  studentHousingDB.getListingByID = async (listingID) => {
+  studentHousingDB.getListingByID = async listingID => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -563,7 +598,7 @@ let StudentHousingDBController = function () {
   };
 
   // // read selected Listing info
-  studentHousingDB.getListingsByAuthorID = async (authorID) => {
+  studentHousingDB.getListingsByAuthorID = async authorID => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -594,7 +629,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.createRating = async (newRating) => {
+  studentHousingDB.createRating = async newRating => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -624,7 +659,7 @@ let StudentHousingDBController = function () {
   };
 
   // // update Listing info
-  studentHousingDB.updateRating = async (ratingToUpdate) => {
+  studentHousingDB.updateRating = async ratingToUpdate => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -658,7 +693,7 @@ let StudentHousingDBController = function () {
   };
 
   // // update Listing info
-  studentHousingDB.updateListing = async (listingToUpdate) => {
+  studentHousingDB.updateListing = async listingToUpdate => {
     let client;
     const redisClient = createClient();
     try {
@@ -670,6 +705,12 @@ let StudentHousingDBController = function () {
       await redisClient.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
+
+      if (listingToUpdate.available == "true") {
+        listingToUpdate.available = true;
+      } else {
+        listingToUpdate.available = false;
+      }
       const updateResult = await listingsCollection.updateOne(
         {
           listingID: listingToUpdate.listingID,
@@ -759,7 +800,7 @@ let StudentHousingDBController = function () {
   //  ***************MESSAGE CRUD OPERATIONS*********************
   //  */
 
-  studentHousingDB.createMessage = async (newMessage) => {
+  studentHousingDB.createMessage = async newMessage => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -833,7 +874,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.getAllMessages = async (username) => {
+  studentHousingDB.getAllMessages = async username => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -858,7 +899,7 @@ let StudentHousingDBController = function () {
   };
 
   // delete Message
-  studentHousingDB.deleteMessage = async (messageToDelete) => {
+  studentHousingDB.deleteMessage = async messageToDelete => {
     let client;
     try {
       client = new MongoClient(uri, {
@@ -894,7 +935,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.getRankedListingsByAuthorID = async (authorID) => {
+  studentHousingDB.getRankedListingsByAuthorID = async authorID => {
     const redisClient = createClient();
 
     try {
@@ -923,7 +964,7 @@ let StudentHousingDBController = function () {
     }
   };
 
-  studentHousingDB.rankListing = async (listing) => {
+  studentHousingDB.rankListing = async listing => {
     const redisClient = createClient();
 
     try {

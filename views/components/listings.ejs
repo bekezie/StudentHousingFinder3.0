@@ -1,4 +1,12 @@
+
+<% if (!available) { %>
 <h2>Listings</h2>
+<%} else { %>
+<h2>All Available Listings</h2>
+<% } %>
+<!-- Show Unavailable Listings -->
+<%- include("./availableListings.ejs") %>
+
 <ul>
   <% listings.forEach(function (l) { %>
   <a

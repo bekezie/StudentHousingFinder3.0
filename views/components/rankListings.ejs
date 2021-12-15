@@ -1,0 +1,17 @@
+<% if (!rank) { %>
+<div>
+</br>
+<form action="/rankListing" method="GET">
+    
+    <button type="submit" class="btn btn-success">Rank Listing by Rating</button>
+</form>
+</div>
+<%} else { %>
+<div>
+</br>
+<form action="/" method="GET">
+    
+    <button type="submit" class="btn btn-success">Unrank Listing</button>
+</form>
+</div>
+<% } %>

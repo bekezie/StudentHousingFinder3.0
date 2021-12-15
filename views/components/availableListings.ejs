@@ -1,0 +1,11 @@
+<% if (!available) { %>
+<form action="/listings/available" method="POST">
+  <button type="submit" class="btn btn-success">
+    See Only Available Units
+  </button>
+</form>
+<%} else { %>
+<form action="/" method="GET">
+  <button type="submit" class="btn btn-success">See All Units</button>
+</form>
+<% } %>

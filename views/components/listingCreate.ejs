@@ -84,8 +84,8 @@
     <label for="available" class="form-label"
       >Available:
       <select class="form-select" id="available" name="available">
-        <option value="TRUE">Yes</option>
-        <option value="FALSE">No</option>
+        <option value=true>Yes</option>
+        <option value=false>No</option>
       </select>
     </label>
   </div>
@@ -103,9 +103,10 @@
   <button type="submit" class="btn btn-primary">Create</button>
 </form>
 
-<form action="/ranklisting" method="POST">
-    <div>
-    Rank Listing by Rating
-    </div>
-    <button type="submit" class="btn btn-secondary">Rank</button>
+<div>
+</br>
+<form action="/rankListing" method="GET">
+    
+    <button type="submit" class="btn btn-success">Rank Listing by Rating</button>
 </form>
+</div>

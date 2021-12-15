@@ -1,4 +1,10 @@
+<% if (!unavailable) { %>
 <h2>Listings</h2>
+<%} else { %>
+<h2>All Unavailable Listings</h2>
+<% } %>
+<!-- Show Unavailable Listings -->
+<%- include("./unavailableListings.ejs") %>
 <ul>
   <% listings.forEach(function (l) { %>
   <a
@@ -29,7 +35,7 @@
         id="listingID"
         value="<%= l.listingID %>"
       />
-       <input
+      <input
         type="hidden"
         name="authorID"
         id="authorID"

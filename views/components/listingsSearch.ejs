@@ -67,34 +67,9 @@
       />
     </label>
   </div>
-<!--   <div>
-    <label for="available" class="form-label"
-      >Available
-      <input type="radio" id="available" name="available" value="true" />
-    </label>
-  </div> -->
   <button type="submit" class="btn btn-primary">Search</button>
 </form>
-<div>
-</br>
-  <form action="/listings/available" method="POST">
-    <button type="submit" class="btn btn-secondary">See Only Available Units</button>
-  </form>
-  </div>
+<%- include("./rankListings.ejs") %>
 
-  <div>
-  </br>
-  <form action="/" method="GET">
-    <button type="submit" class="btn btn-secondary">See All Units</button>
-  </form>
-</div>
-
-<div>
-</br>
-<form action="/rankListing" method="GET">
-    
-    <button type="submit" class="btn btn-secondary">Rank Listing by Rating</button>
-</form>
-</div>
 
 
