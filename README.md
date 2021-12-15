@@ -77,6 +77,9 @@ Bernard Ekezie (https://github.com/bekezie) & Ely (Esther) Lam (https://github.c
 -  CRUD operations on the ratings.
 -  CRUD operations on the user and ensuring users have a unique username.
 -  Created Document Base Logical modal.
+-  Rank listings based on highest rating in redis. 
+-  CRUD operations on ranked listing by rating ensuring that any changes made by user will be handle throughout mongodb and redis.
+-  Created toogle for owners and students to rank and unrank listing by highest rating.
 
 # Project 2 (Part 2: Design):
 
