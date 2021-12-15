@@ -36,11 +36,17 @@
   </div>
   <div>
     <label for="unitType" class="form-label"
-      >Unit type:
+      >Unit type: <% if (listing.unitType == "dorm") { %>
       <select class="form-select" id="unitType" name="unitType">
         <option value="dorm">Dorm</option>
         <option value="apartment">Apartment</option>
       </select>
+      <%} else { %>
+      <select class="form-select" id="unitType" name="unitType">
+        <option value="apartment">Apartment</option>
+        <option value="dorm">Dorm</option>
+      </select>
+      <% } %>
     </label>
   </div>
   <div>
@@ -86,10 +92,13 @@
     <label class="form-label"
       >Opening Date:
       <input
-        class="form-control"
+        class="form-control date-picker"
         name="openingDate"
         type="date"
         value="<%= listing.openingDate %>"
+        placeholder="dd-mm-yyyy"
+        min="1997-01-01"
+        max="2030-12-31"
       />
     </label>
   </div>
@@ -109,8 +118,8 @@
     <label for="available" class="form-label"
       >Available:
       <select class="form-select" id="available" name="available">
-        <option value=true>Yes</option>
-        <option value=false>No</option>
+        <option value="true">Yes</option>
+        <option value="false">No</option>
       </select>
     </label>
   </div>

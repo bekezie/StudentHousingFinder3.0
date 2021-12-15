@@ -214,11 +214,11 @@ let StudentHousingDBController = function () {
         title: newListing.title,
         location: newListing.location,
         unitType: newListing.unitType,
-        sizeInSqFt: newListing.sizeInSqFt,
-        rentPerMonth: newListing.rentPerMonth,
+        sizeInSqFt: parseInt(newListing.sizeInSqFt),
+        rentPerMonth: parseInt(newListing.rentPerMonth),
         description: newListing.description,
         openingDate: newListing.openingDate,
-        leaseInMonths: newListing.leaseInMonths,
+        leaseInMonths: parseInt(newListing.leaseInMonths),
         available: newListing.available,
         authorID: authorID,
       };
@@ -498,7 +498,7 @@ let StudentHousingDBController = function () {
   };
 
   // search Listings , may implement pagination later
-  studentHousingDB.searchListings = async searchCriteria => {
+  studentHousingDB.searchListings = async (criteria, search) => {
     let mongoClient;
     try {
       mongoClient = new MongoClient(uri, {
@@ -508,46 +508,38 @@ let StudentHousingDBController = function () {
       await mongoClient.connect();
       const db = mongoClient.db(DB_NAME);
       const listingsCollection = db.collection("listings");
-      if (searchCriteria != undefined) {
-        try {
-          let filter = {
-            $or: [
-              {
-                location: /.*searchCriteria.location.*/,
-              },
-              {
-                sizeInSqFt: /.*searchCriteria.sizeInSqFt.*/,
-              },
-              {
-                unitType: searchCriteria.unitType,
-              },
-              {
-                rentPerMonth: /.*searchCriteria.rentPerMonth.*/,
-              },
-              {
-                description: /.*searchCriteria.description.*/,
-              },
-              {
-                openingDate: searchCriteria.openingDate,
-              },
-              {
-                leaseInMonths: searchCriteria.leaseInMonths,
-              },
-              {
-                available: searchCriteria.available,
-              },
-            ],
-          };
-          let sort = {
-            listingID: -1,
-          };
-          const queryResult = await listingsCollection
-            .find(filter, { sort: sort })
-            .toArray();
-          return queryResult;
-        } catch (err) {
-          console.log("search unsuccessful", err);
+      if (criteria != undefined) {
+        let filter, sort;
+        if (criteria == "title") {
+          filter = { title: { $regex: search } };
+          sort = { title: 1 };
+        } else if (criteria == "location") {
+          filter = { location: { $regex: search } };
+          sort = { location: 1 };
+        } else if (criteria == "sizeInSqFt") {
+          filter = { sizeInSqFt: { $lte: parseInt(search) } };
+          sort = { sizeInSqFt: 1 };
+        } else if (criteria == "unitType") {
+          filter = { unitType: search };
+          sort = { unitType: 1 };
+        } else if (criteria == "rentPerMonth") {
+          filter = { rentPerMonth: { $lte: parseInt(search) } };
+          sort = { rentPerMonth: 1 };
+        } else if (criteria == "description") {
+          filter = { description: { $regex: search } };
+          sort = { description: 1 };
+        } else if (criteria == "openingDate") {
+          filter = { openingDate: { $eq: search } };
+          sort = { openingDate: 1 };
+        } else {
+          filter = { leaseInMonths: { $eq: parseInt(search) } };
+          sort = { leaseInMonths: 1 };
         }
+        const queryResult = await listingsCollection
+          .find(filter)
+          .sort(sort)
+          .toArray();
+        return queryResult;
       } else {
         try {
           const queryResult = await listingsCollection
@@ -719,12 +711,12 @@ let StudentHousingDBController = function () {
           $set: {
             title: listingToUpdate.title,
             location: listingToUpdate.location,
-            sizeInSqFt: listingToUpdate.sizeInSqFt,
+            sizeInSqFt: parseInt(listingToUpdate.sizeInSqFt),
             unitType: listingToUpdate.unitType,
-            rentPerMonth: listingToUpdate.rentPerMonth,
+            rentPerMonth: parseInt(listingToUpdate.rentPerMonth),
             description: listingToUpdate.description,
             openingDate: listingToUpdate.openingDate,
-            leaseInMonths: listingToUpdate.leaseInMonths,
+            leaseInMonths: parseInt(listingToUpdate.leaseInMonths),
             available: listingToUpdate.available,
           },
         }

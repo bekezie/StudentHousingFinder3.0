@@ -27,7 +27,7 @@ router.get("/", async function (req, res) {
       const authorID = user.authorID;
       // console.log("owner session: ", req.session);
       const ownerListings = await studentHousingDB.getListingsByAuthorID(
-        authorID
+        parseInt(authorID)
       );
       console.log("render ownerHomePage");
       res.render("ownerHomePage", {
@@ -86,19 +86,16 @@ router.post("/search/Listing", async function (req, res) {
   // console.log("Attempting GET /");
   console.log("Attempting searches for POST /search/Listing");
 
-  let criteria = req.body;
-  let search = {
-    location: criteria.location,
-    sizeInSqFt: criteria.sizeInSqFt,
-    unitType: criteria.unitType,
-    rentPerMonth: criteria.rentPerMonth,
-    description: criteria.description,
-    openingDate: criteria.openingDate,
-    leaseInMonths: criteria.leaseInMonths,
-    available: criteria.available,
-  };
-  console.log(search);
-  const listings = await studentHousingDB.searchListings(search);
+  let query = JSON.parse(JSON.stringify(req.body));
+  console.log(query);
+  let key, criteria, search;
+  for (key in query) {
+    criteria = key;
+    // console.log(key);
+    search = query[key];
+    console.log(query[key]);
+  }
+  const listings = await studentHousingDB.searchListings(criteria, search);
   console.log("got listings");
 
   session = req.session;
@@ -113,6 +110,7 @@ router.post("/search/Listing", async function (req, res) {
         title: "StudentHousingFinderStudentHome",
         listings: listings,
         available: false,
+        rank: false,
         username: user.username,
         student: user.firstName,
       });
@@ -125,6 +123,7 @@ router.post("/search/Listing", async function (req, res) {
       title: "StudentHousingFinderHome",
       listings: listings,
       available: false,
+      rank: false,
     });
   }
 });
@@ -162,7 +161,7 @@ router.post("/listings/available", async function (req, res) {
     res.render("index", {
       title: "StudentHousingFinderHome",
       listings: available,
-      available: false,
+      available: true,
       rank: false,
     });
   }
@@ -268,8 +267,8 @@ router.get("/rankListing", async function (req, res) {
     //console.log(listings);
     console.log("got listings");
     //get listing refrence, sorted by score ranking of highest rating
-    let mongoListings = await studentHousingDB.getSortedListings();
-    console.log(mongoListings);
+    // let mongoListings = await studentHousingDB.getSortedListings();
+    // console.log(mongoListings);
 
     session = req.session;
 
