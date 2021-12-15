@@ -79,7 +79,7 @@ Bernard Ekezie (https://github.com/bekezie) & Ely (Esther) Lam (https://github.c
 -  Created Document Base Logical modal.
 -  Rank listings based on highest rating in redis. 
 -  CRUD operations on ranked listing by rating ensuring that any changes made by user will be handle throughout mongodb and redis.
--  Created toogle for owners and students to rank and unrank listing by highest rating.
+-  Created toogle for owners and students to rank and unrank listings by highest rating.
 
 # Project 2 (Part 2: Design):
 
