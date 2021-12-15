@@ -33,6 +33,7 @@ router.get("/", async function (req, res) {
       res.render("ownerHomePage", {
         title: "StudentHousingFinderOwnerHome",
         listings: ownerListings,
+        unavailable: false,
         username: user.username,
         authorID: authorID,
       });
@@ -41,6 +42,7 @@ router.get("/", async function (req, res) {
       res.render("studentHomePage", {
         title: "StudentHousingFinderStudentHome",
         listings: listings,
+        available: false,
         username: user.username,
         student: user.username,
       });
@@ -50,6 +52,7 @@ router.get("/", async function (req, res) {
     res.render("index", {
       title: "StudentHousingFinderHome",
       listings: listings,
+      available: false,
     });
   }
 });
@@ -106,6 +109,7 @@ router.post("/search/Listing", async function (req, res) {
       res.render("studentHomePage", {
         title: "StudentHousingFinderStudentHome",
         listings: listings,
+        available: false,
         username: user.username,
         student: user.firstName,
       });
@@ -117,6 +121,7 @@ router.post("/search/Listing", async function (req, res) {
     res.render("index", {
       title: "StudentHousingFinderHome",
       listings: listings,
+      available: false,
     });
   }
 });
@@ -125,50 +130,74 @@ router.post("/search/Listing", async function (req, res) {
 router.post("/listings/available", async function (req, res) {
   console.log("Attempting POST /listings/available");
 
-  const listings = await studentHousingDB.getListings();
   const available = await studentHousingDB.getAvailableListings();
   console.log("got listings");
 
   session = req.session;
 
   if (session.userid) {
-    console.log("got session " + session.userid);
+    // console.log("got session " + session.userid);
 
     let user = await studentHousingDB.getUserByUsername(session.userid);
     // console.log("got user", user);
 
-    if (user.authorID != undefined) {
-      let authorID = user.authorID;
-      console.log("owner session: ", req.session);
-      let ownerListings = await studentHousingDB.getListingsByAuthorID(
-        authorID
-      );
-
-      // console.log("render ownerHomePage ");
-      res.render("ownerHomePage", {
-        title: "StudentHousingFinderOwnerHome",
-        listings: ownerListings,
+    console.log("render studentHomePage ");
+    try {
+      res.render("studentHomePage", {
+        title: "StudentHousingFinderStudentHome",
+        listings: available,
+        available: true,
         username: user.username,
-        authorID: authorID,
+        student: user.firstName,
       });
-    } else {
-      console.log("render studentHomePage ");
-      try {
-        res.render("studentHomePage", {
-          title: "StudentHousingFinderStudentHome",
-          listings: available,
-          username: user.username,
-          student: user.firstName,
-        });
-      } catch (err) {
-        console.log("failed to render");
-      }
+    } catch (err) {
+      console.log("failed to render");
     }
   } else {
     // console.log("render index");
     res.render("index", {
       title: "StudentHousingFinderHome",
       listings: available,
+      available: false,
+    });
+  }
+});
+
+/* POST available listings page. */
+router.post("/listings/unavailable", async function (req, res) {
+  console.log("Attempting POST /listings/available");
+
+  session = req.session;
+  let unavailable;
+
+  if (session.userid) {
+    // console.log("got session " + session.userid);
+
+    let user = await studentHousingDB.getUserByUsername(session.userid);
+    // console.log("got user", user);
+    const authorID = user.authorID;
+
+    unavailable = await studentHousingDB.getUnavailableListings(authorID);
+    console.log("got listings");
+
+    console.log("render ownerHomePage ");
+    try {
+      res.render("ownerHomePage", {
+        title: "StudentHousingFinderOwnerHome",
+        listings: unavailable,
+        unavailable: true,
+        username: user.username,
+        authorID: authorID,
+      });
+    } catch (err) {
+      console.log("failed to render");
+    }
+  } else {
+    // console.log("render index");
+    res.render("index", {
+      title: "StudentHousingFinderHome",
+      listings: unavailable,
+      unavailable: false,
     });
   }
 });
@@ -253,6 +282,7 @@ router.post("/rankListing", async function (req, res) {
         res.render("ownerHomePage", {
           title: "StudentHousingFinderOwnerHome",
           listings: ownerListings,
+          unavailable: false,
           username: user.username,
           authorID: authorID,
         });
@@ -261,6 +291,7 @@ router.post("/rankListing", async function (req, res) {
         res.render("studentHomePage", {
           title: "StudentHousingFinderStudentHome",
           listings: redisListings,
+          available: false,
           username: user.username,
           student: user.username,
         });
@@ -270,6 +301,7 @@ router.post("/rankListing", async function (req, res) {
       res.render("index", {
         title: "StudentHousingFinderHome",
         listings: redisListings,
+        available: false,
       });
     }
 

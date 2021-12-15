@@ -1,0 +1,11 @@
+<% if (!unavailable) { %>
+<form action="/listings/unavailable" method="POST">
+  <button type="submit" class="btn btn-success">
+    Show Unavailable Listings Only
+  </button>
+</form>
+<%} else { %>
+<form action="/" method="GET">
+  <button type="submit" class="btn btn-success">See All Units</button>
+</form>
+<% } %>

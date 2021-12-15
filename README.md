@@ -79,8 +79,8 @@ Bernard Ekezie (https://github.com/bekezie) & Ely (Esther) Lam (https://github.c
 
 # Project 2 (Part 2: Design):
 
-Link to Business Requirements: https://docs.google.com/document/d/1U-KUPu-nW8fwHIpMbF03xYfmWVMdTYuDPdS_fJP_PdY/edit
-\*Found in ./design/CS5200_Project2_BusinessRequirements.pdf
+Link to Business Requirements and Redis Structure Definitions: https://docs.google.com/document/d/1U-KUPu-nW8fwHIpMbF03xYfmWVMdTYuDPdS_fJP_PdY/edit
+\*Found in ./design/CS5200_Project3_BusinessRequirements.pdf
 
 UML Diagram
 ![Logo](design/Project2-UML.png)
