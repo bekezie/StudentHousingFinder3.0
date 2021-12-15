@@ -309,6 +309,11 @@ let StudentHousingDBController = function () {
       await redisClient.del("unavailableListings");
 
       await listingsCollection.find().forEach(async function (listing) {
+        let avgRating = await redisClient.hGet(
+          `listing:${listing.listingID}:${listing.authorID}`,
+          "avgRating"
+        );
+        console.log("avgRating", avgRating);
         await redisClient.hSet(`listing:${listing.listingID}`, {
           listingID: `${listing.listingID}`,
           title: listing.title,
@@ -321,7 +326,7 @@ let StudentHousingDBController = function () {
           leaseInMonths: `${listing.leaseInMonths}`,
           available: listing.available,
           authorID: `${listing.authorID}`,
-          avgRating: `${listing.avgRating}`,
+          avgRating: avgRating,
         });
       });
 
@@ -376,6 +381,23 @@ let StudentHousingDBController = function () {
       await redisClient.del("unavailableListings");
 
       await listingsCollection.find().forEach(async function (listing) {
+        await redisClient.hSet(`listing:${listing.listingID}`, {
+          listingID: `${listing.listingID}`,
+          title: listing.title,
+          location: listing.location,
+          unitType: listing.unitType,
+          sizeInSqFt: listing.sizeInSqFt,
+          rentPerMonth: listing.sizeInSqFt,
+          description: listing.description,
+          openingDate: listing.openingDate,
+          leaseInMonths: `${listing.leaseInMonths}`,
+          available: listing.available,
+          authorID: `${listing.authorID}`,
+          avgRating: `${listing.avgRating}`,
+        });
+      });
+
+      await listingsCollection.find().forEach(async function (listing) {
         if (listing.available) {
           await redisClient.rPush("availableListings", `${listing.listingID}`);
         } else {
@@ -399,7 +421,9 @@ let StudentHousingDBController = function () {
         i < (await redisClient.lLen("unavailableListings"));
         i++
       ) {
-        let listing = await redisClient.hGetAll(`listing:${unavailableIDs[i]}`);
+        let listing = await redisClient.hGetAll(
+          `listing:${unavailableIDs[i]}:${authorID}`
+        );
         console.log(`listing:${unavailableIDs[i]}: `, listing);
         if (
           listing.listingID == unavailableIDs[i] &&
