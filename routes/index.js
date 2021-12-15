@@ -157,7 +157,6 @@ router.post("/listings/available", async function (req, res) {
         res.render("studentHomePage", {
           title: "StudentHousingFinderStudentHome",
           listings: available,
-          available: available,
           username: user.username,
           student: user.firstName,
         });
@@ -349,6 +348,30 @@ router.post("/createRating", async function (req, res) {
   try {
     await studentHousingDB.createRating(rating);
     // console.log("rating created");
+
+    let redisListings = await studentHousingDB.getSortedListings();
+    if (redisListings.length > 0) {
+      //console.log(listings);
+      console.log("got getRankedListings");
+      //get listing refrence, sorted by score ranking of highest rating
+      const mongoListings = await studentHousingDB.getRankedListings();
+      await studentHousingDB.setScore();
+      for (let i = 0; i < mongoListings.length; i++) {
+        console.log("iterations " + i);
+
+        //creates object of listing object
+        console.log(mongoListings[i]);
+
+        await studentHousingDB.rankListing(mongoListings[i]);
+        //break;
+      }
+      //get listing refrence, sorted by score ranking of highest rating
+
+      redisListings = await studentHousingDB.getSortedListings();
+      console.log(redisListings);
+
+      console.log("Ranked Listings have been set! Data retrival from mongodb.");
+    }
   } catch (err) {
     // console.log("rating not created");
   }
@@ -372,6 +395,31 @@ router.post("/updateRating", async function (req, res) {
   try {
     await studentHousingDB.updateRating(updatedrating);
     // console.log("Listing updated", updatedrating);
+    let redisListings = await studentHousingDB.getSortedListings();
+    if (redisListings.length > 0) {
+      //console.log(listings);
+      console.log("got listings");
+      //get listing refrence, sorted by score ranking of highest rating
+
+      console.log("got getRankedListings");
+      const mongoListings = await studentHousingDB.getRankedListings();
+      await studentHousingDB.setScore();
+      for (let i = 0; i < mongoListings.length; i++) {
+        console.log("iterations " + i);
+
+        //creates object of listing object
+        console.log(mongoListings[i]);
+
+        await studentHousingDB.rankListing(mongoListings[i]);
+        //break;
+      }
+      //get listing refrence, sorted by score ranking of highest rating
+
+      redisListings = await studentHousingDB.getSortedListings();
+      console.log(redisListings);
+
+      console.log("Ranked Listings have been set! Data retrival from mongodb.");
+    }
   } catch (err) {
     // console.log("Listing not updated");
   }
@@ -396,7 +444,7 @@ router.get("/listings/:listingID", async function (req, res) {
     // console.log("Got listing details ", listingID);
 
     const listing = await studentHousingDB.getListingByID(listingID);
-    // console.log("Got listing by ID ", listing);
+    console.log("Got listing by ID ", listing);
 
     // const studObj = {
     //   listingID: listingID,
