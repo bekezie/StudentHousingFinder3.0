@@ -358,10 +358,33 @@ let StudentHousingDBController = function () {
 
   // // get unavailable Listings
   studentHousingDB.getUnavailableListings = async authorID => {
-    let redisClient;
+    let mongoClient, redisClient;
     try {
+      mongoClient = new MongoClient(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      await mongoClient.connect();
+      const db = mongoClient.db(DB_NAME);
+      const listingsCollection = db.collection("listings");
+
       redisClient = createClient();
       await redisClient.connect();
+
+      // delete if already exists
+      await redisClient.del("availableListings");
+      await redisClient.del("unavailableListings");
+
+      await listingsCollection.find().forEach(async function (listing) {
+        if (listing.available) {
+          await redisClient.rPush("availableListings", `${listing.listingID}`);
+        } else {
+          await redisClient.rPush(
+            "unavailableListings",
+            `${listing.listingID}`
+          );
+        }
+      });
 
       let unavailableListings = [];
 
@@ -682,6 +705,12 @@ let StudentHousingDBController = function () {
       await redisClient.connect();
       const db = client.db(DB_NAME);
       const listingsCollection = db.collection("listings");
+
+      if (listingToUpdate.available == "true") {
+        listingToUpdate.available = true;
+      } else {
+        listingToUpdate.available = false;
+      }
       const updateResult = await listingsCollection.updateOne(
         {
           listingID: listingToUpdate.listingID,
