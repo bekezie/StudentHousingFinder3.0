@@ -67,7 +67,8 @@ Bernard Ekezie (https://github.com/bekezie) & Ely (Esther) Lam (https://github.c
 -  Create warning if users try to register with non-unique username.
 -  Search listings by certain criteria (finds all that matches at least one of the search criteria but not all criteria).
 -  Making instructions on setup and importing collections to localhost.
--  Create switch to view available listings or all listings
+-  Create toggle view for students to view available listings or all listings
+-  Create toggle view for owners to view unavailable listings or all listings so owners can delete them
 
 @Bernard Ekezie implemented:
 
@@ -80,7 +81,7 @@ Bernard Ekezie (https://github.com/bekezie) & Ely (Esther) Lam (https://github.c
 # Project 2 (Part 2: Design):
 
 Link to Business Requirements and Redis Structure Definitions: https://docs.google.com/document/d/1U-KUPu-nW8fwHIpMbF03xYfmWVMdTYuDPdS_fJP_PdY/edit
-\*Found in ./design/CS5200_Project3_BusinessRequirements.pdf
+\*Found in ./design/CS5200_Project3_BusReqs&RedisStructDefs.pdf
 
 UML Diagram
 ![Logo](design/Project2-UML.png)
