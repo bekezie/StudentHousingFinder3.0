@@ -55,9 +55,9 @@ Ranking Listings
 
 ## Authors:
 
-Bernard Ekezie (https://github.com/bekezie) & Ely (Esther) Lam (https://github.com/ely-lam)
+Bernard Ekezie (https://github.com/bekezie) & Domenic (Ely) Lam (https://github.com/domenic-lam)
 
-@Ely Lam implemented:
+@Domenic (Ely) Lam implemented:
 
 -  Registering the owners and updating their listings as they post new housing listings.
 -  CRUD operations on the listings.
