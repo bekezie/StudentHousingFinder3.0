@@ -37,19 +37,19 @@ Ranking Listings
 1. Clone the repository
 2. In terminal: `npm install`
 
-#   Imports:
-4. To import listings:
+   Imports:
+3. To import listings:
    `mongoimport -h localhost:27017 -d project2 -c listings --file ./db/Listing.json --jsonArray`
-5. To import messages:
+4. To import messages:
    `mongoimport -h localhost:27017 -d project2 -c messages --file ./db/Message.json --jsonArray`
-6. To import users:
+5. To import users:
    `mongoimport -h localhost:27017 -d project2 -c users --file ./db/Student.json --jsonArray`
    `mongoimport -h localhost:27017 -d project2 -c users --file ./db/Owner.json --jsonArray`
-7. To import schools:
+6. To import schools:
    `mongoimport -h localhost:27017 -d project2 -c schools --file ./db/Schools.json --jsonArray`
 
-8. In terminal: `npm start`
-9. In browser, go to http://localhost:3000
+7. In terminal: `npm start`
+8. In browser, go to http://localhost:3000
 
 > _Register and Sign In Note:
 > Because owners and students have different permissions for listings, page will look different depending on whether you sign up as an owner or a student._
