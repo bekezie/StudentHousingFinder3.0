@@ -88,6 +88,6 @@ Link to Business Requirements and Redis Structure Definitions: https://docs.goog
 \*Found in ./design/CS5200_Project3_BusReqs&RedisStructDefs.pdf
 
 UML Diagram
-![Logo](design/Project2-UML.png)
+![Logo](design/Project2_UML.png)
 ER Diagram
 ![Logo](design/Project2-DBMS-ERD.png)
